@@ -13,32 +13,32 @@
   import List from './lib/list.svelte'
 	let page = 3;
 </script>
-
-<main>
+  
+<main> 
   {#if page == 1 }
     <Intro bind:page={page}/>
   {:else if page == 2 }
     <Login bind:page={page}/>
   {:else if page == 3 }
-    <Home bind:page={page}/>
+    <Home/>
   {:else if page == 4 }
-    <Profile bind:page={page}/>
+    <Profile />
   {:else if page == 5 }
-    <Settings bind:page={page}/>
+    <Settings/>
   {:else if page == 6 }
-    <Chat bind:page={page}/>
+    <Chat/>
   {:else if page == 7 }
-    <Post bind:page={page}/>
+    <Post/>
   {:else if page == 8 }
-    <Search bind:page={page}/>
+    <Search />
   {:else if page == 9 }
-    <Following bind:page={page}/>
+    <Following/>
   {:else if page == 10 }
-    <Notification bind:page={page}/>
+    <Notification/>
   {:else if page == 11 }
-    <Comment bind:page={page}/>
+    <Comment/>
   {:else if page == 12 }
-    <List bind:page={page}/>
+    <List/>
   {/if}
 </main>
 
