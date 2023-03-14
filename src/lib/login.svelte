@@ -2,14 +2,17 @@
 import { makeRequest } from '../api.js';
 import { DB } from '../db.js';
 import { onMount } from 'svelte';
-const userData = {
+export let page;	
+const userData = { 
     name: 'test',
-    pass: 'Bethro77'
+    pass: 'Bethro77',
+	  email: ''
 };	
-	type = "login"
+let type = "login";
+	
 function login(userData) {
-	if(DB('g','login')){
-		return;  
+	if(DB('get','login')){
+		return swal("hey", "You are already loggedin", "info");  
 	}
   const headers = {
     'Content-Type': 'text/plain',
@@ -20,8 +23,13 @@ function login(userData) {
   };
   makeRequest('login', 'POST', params, headers)
     .then(response => {
+			if(response.data.username){ 
 			DB("set",'login', response.data)
+			page = 3;
       console.log(DB("get",'login','user'));
+			}else{
+				 swal("Error",  response.data.msg, "error");
+			}
     })
     .catch(function (error) {
       console.error(error);
@@ -35,21 +43,21 @@ function login(userData) {
     <div class="form">
       <h1>login</h1>
       <input type="text" bind:value={userData.name} placeholder="username..." id="f_mail">
-      <input type="text" bind:value={userData.pass} placeholder="password..." id="f_pass">
+      <input type="password" bind:value={userData.pass} placeholder="password..." id="f_pass">
       <button type="submit" class="btn" on:click={login(userData)}> login</button>
       <br>
-      <p>Forgot your <b>username</b> or <b>password?</b></p>
-      <button class="btn" on:click={() => type = 'signup'}> Sign up</button>
+      <p>Don't have an account <b><a  on:click={() => type = 'signup'}>Signup</a></b>
+				or <a >forgot password?</a></p>
     </div>
   {:else}
     <div class="form">
       <h1>sign up</h1>
       <input type="text" bind:value={userData.name} placeholder="username..." id="f_mail">
-      <input type="text" bind:value={userData.pass} placeholder="password..." id="f_pass">
+      <input type="email" bind:value={userData.email} placeholder="email" id="f_email">
+      <input type="password" bind:value={userData.pass} placeholder="password..." id="f_pass">
       <button type="submit" class="btn" on:click={signup(userData)}> signup</button>
       <br>
-      <p>Already have an account? <b>Login</b></p>
-      <button class="btn" on:click={() => type = 'login'}> Login</button>
+      <p>Already have an account? <a on:click={() => type = 'login'}>Login</a></p>
     </div>
   {/if}
 </main>
@@ -64,6 +72,9 @@ main{
 	background: #a89ef5;	
 	text-align: center;
  }
+	a{
+		color: hsl(275, 100%, 56%);
+	}
 	.h1{
 		background: none;
 		padding:0;
