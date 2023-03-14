@@ -1,6 +1,12 @@
 <script>
 import image from "../assets/chat.svg"
 
+
+function handleLogin() {
+    page = 2;
+}
+
+export let page;	
 </script>
 
 <main>
@@ -9,10 +15,9 @@ import image from "../assets/chat.svg"
 	</div>
 	<div class="text">
 		<p>welcome to suplike chat app, connecting you with the people around you</p>
-		<button class="btn">get started</button>
+		<button class="btn" on:click={handleLogin}>get started</button>
 	</div>
 </main>
-
 <style>
 
  main{

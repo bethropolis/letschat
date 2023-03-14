@@ -12,6 +12,7 @@
     "vite": "^3.0.4"
   },
   "dependencies": {
-    "axios": "^0.27.2"
+    "axios": "^0.27.2",
+    "sweetalert": "^2.1.2"
   }
 }

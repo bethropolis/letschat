@@ -1,47 +1,66 @@
 <script>
-import axios from 'axios';
+import { makeRequest } from '../api.js';
+import { DB } from '../db.js';
 import { onMount } from 'svelte';
-let userData = {
-	name: 'Jonna',
-	pass: 'Jonna7'
-};
-const headers = {
-        'Content-Type': 'text/plain'
-    };
-$: data = {
-		userEmail: userData.name,
-		userPass: userData.pass,
+const userData = {
+    name: 'test',
+    pass: 'Bethro77'
+};	
+	type = "login"
+function login(userData) {
+	if(DB('g','login')){
+		return;  
 	}
+  const headers = {
+    'Content-Type': 'text/plain',
+  };
+  const params = {
+    usermail: userData.name,
+    userpass: userData.pass,
+  };
+  makeRequest('login', 'POST', params, headers)
+    .then(response => {
+			DB("set",'login', response.data)
+      console.log(DB("get",'login','user'));
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
 	
-function login() {
-	console.log(userData);
-	axios.post('https://bethro.alwaysdata.net/api/v1/?login', data,{headers})
-	.then(response => {
-		console.log(response.data);
-		alert(response.data);
-	})
-	.catch(function (error) {
-		console.error(error);
-	});
-		
-	}
 </script>
 
 <main>
-<div class="form">
-		<h1>sign up</h1>
-	<input type="text"  bind:value={userData.name} placeholder="username..." id="f_mail">
-	<input type="text" bind:value={userData.pass} placeholder="password..." id="f_pass">
-	<button type="submit" class="btn"  on:click={login}> login</button>
-	<br>
-	<p>Haven't <b>signup</b> or <b>forgot password?</b></p>
-</div>
+  {#if type === 'login'}
+    <div class="form">
+      <h1>login</h1>
+      <input type="text" bind:value={userData.name} placeholder="username..." id="f_mail">
+      <input type="text" bind:value={userData.pass} placeholder="password..." id="f_pass">
+      <button type="submit" class="btn" on:click={login(userData)}> login</button>
+      <br>
+      <p>Forgot your <b>username</b> or <b>password?</b></p>
+      <button class="btn" on:click={() => type = 'signup'}> Sign up</button>
+    </div>
+  {:else}
+    <div class="form">
+      <h1>sign up</h1>
+      <input type="text" bind:value={userData.name} placeholder="username..." id="f_mail">
+      <input type="text" bind:value={userData.pass} placeholder="password..." id="f_pass">
+      <button type="submit" class="btn" on:click={signup(userData)}> signup</button>
+      <br>
+      <p>Already have an account? <b>Login</b></p>
+      <button class="btn" on:click={() => type = 'login'}> Login</button>
+    </div>
+  {/if}
 </main>
 
+
 <style>
-main{
-	 width: 100vw;
-	 height: 100%; 
+main{ 
+	display: grid;
+	place-content: center;
+	width: 100vw;
+	height: 100vh; 
 	background: #a89ef5;	
 	text-align: center;
  }
