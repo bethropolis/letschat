@@ -21,4 +21,4 @@ export function DB(type, key, data = '') {
   icon: "error",
 });
   }
-}
+} 

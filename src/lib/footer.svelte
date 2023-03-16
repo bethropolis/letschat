@@ -1,47 +1,95 @@
 <script>
-	
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
+  export let activePage = "";
+
+  function setActivePage(ispage, num) {
+    activePage = ispage;
+    dispatch('updatePage', num);
+  }
 </script>
+
 <main>
-	<footer>
-    <span class="active"><i class="far fa-comments"></i></span>
-    <span><i class="far fa-address-book"></i></span>
-    <span><i class="far fa-user-circle"></i></span>
-  </footer>
+  <nav>
+    <a
+      class:selected={activePage === "home"}
+      href="#"
+      on:click|preventDefault={() => setActivePage("home", 1)}
+    >
+      <i class="fas fa-home" />
+      <span>Home</span>
+    </a>
+    <a
+      class:selected={activePage === "search"}
+      href="#"
+      on:click|preventDefault={() => setActivePage("search", 8)}
+    >
+      <i class="fas fa-search" />
+      <span>Search</span>
+    </a>
+    <a
+      class:selected={activePage === "notifications"}
+      href="#"
+      on:click|preventDefault={() => setActivePage("notifications", 10)}
+    >
+      <i class="fas fa-bell" />
+      <span>Notifications</span>
+    </a>
+    <a
+      class:selected={activePage === "profile"}
+      href="#"
+      on:click|preventDefault={() => setActivePage("profile", 4)}
+    >
+      <i class="fas fa-user" />
+      <span>Profile</span>
+    </a>
+  </nav>
 
-  <a href="" class="btn-write-message"><i class="fas fa-pen"></i></a>
+  <!-- your app content goes here -->
 </main>
+
 <style>
-	
-footer {
-  padding: 10px 5px;
-  background-color: #f2f3fa;
-  font-size: 35px;
-  text-align: center;
-}
+  main {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+  }
 
-footer span {
-  margin: 0 20px;
-  padding: 8px 12px;
-  display: inline-block;
-  border-radius: 18px;
-  cursor: pointer;
-}
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: #fff;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  }
 
-footer span.active {
-  background-color: #938df3;
-  color: #fff;
-  box-shadow: 1px 3px 10px rgba(0, 0, 0, 0.3);
-}
+  a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    text-align: center;
+    color: #aaa;
+    font-size: 12px;
+    text-decoration: none;
+  }
 
-.btn-write-message {
-  background-color: #353645;
-  padding: 10px 15px;
-  color: #fff;
-  font-size: 30px;
-  position: absolute;
-  bottom: 15%;
-  right: 5%;
-  border-radius: 20px;
-}
+  a i {
+    font-size: 20px;
+  }
 
+  a span {
+    margin-top: 3px;
+  }
+
+  a.selected {
+    color: #a89ef5;
+  }
 </style>
