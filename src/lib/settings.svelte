@@ -1,4 +1,3 @@
-
 <!-- Settings.svelte -->
 <script>
   import Header from "./header.svelte";
@@ -59,52 +58,61 @@
     ],
   };
 </script>
+
 <Header />
 <!-- Settings.svelte -->
-  <main class="settings">
-    <header class="settings-header">
-      <div class="settings-header-avatar">
-        <img src={user.avatar} alt="User Avatar" />
-      </div>
-      <h1 class="settings-header-title">{user.name}</h1>
-      <p class="settings-header-subtitle">{user.email}</p>
-    </header>
+<main class="settings">
+  <header class="settings-header">
+    <div class="settings-header-avatar">
+      <img src={user.avatar} alt="User Avatar" />
+    </div>
+    <h1 class="settings-header-title">{user.name}</h1>
+    <p class="settings-header-subtitle">{user.email}</p>
+  </header>
 
-    <ul class="settings-list">
-      {#each settingsPage.sections as section}
-        <li class="settings-list-section">
-          <h2 class="settings-list-section-title">{section.title}</h2>
+  <ul class="settings-list">
+    {#each settingsPage.sections as section}
+      <li class="settings-list-section">
+        <h2 class="settings-list-section-title">{section.title}</h2>
 
-          <ul class="settings-list-items">
-            {#each section.items as item}
-              <li class="settings-list-item">
-                {#if item.type === 'checkbox'}
-                  <label class="settings-list-item-label">
-                    <input class="settings-list-item-checkbox" type="checkbox" checked={Boolean(item.value)}/>
-                    <span>{item.label}</span>
-                  </label>
-                {:else if item.type === 'select'}
-                  <label class="settings-list-item-label">
-                    <span>{item.label}</span>
-                    <select class="settings-list-item-select" value={item.value}>
-                      {#each item.options as option}
-                        <option value={option.value}>{option.label}</option>
-                      {/each}
-                    </select>
-                  </label>
-                {:else}
-                  <label class="settings-list-item-label">
-                    <span>{item.label}</span>
-                    <input class="settings-list-item-input" type={item.type} value={item.value} />
-                  </label>
-                {/if}
-              </li>
-            {/each}
-          </ul>
-        </li>
-      {/each}
-    </ul>
-  </main>
+        <ul class="settings-list-items">
+          {#each section.items as item}
+            <li class="settings-list-item">
+              {#if item.type === "checkbox"}
+                <label class="settings-list-item-label">
+                  <input
+                    class="settings-list-item-checkbox"
+                    type="checkbox"
+                    checked={Boolean(item.value)}
+                  />
+                  <span>{item.label}</span>
+                </label>
+              {:else if item.type === "select"}
+                <label class="settings-list-item-label">
+                  <span>{item.label}</span>
+                  <select class="settings-list-item-select" value={item.value}>
+                    {#each item.options as option}
+                      <option value={option.value}>{option.label}</option>
+                    {/each}
+                  </select>
+                </label>
+              {:else}
+                <label class="settings-list-item-label">
+                  <span>{item.label}</span>
+                  <input
+                    class="settings-list-item-input"
+                    type={item.type}
+                    value={item.value}
+                  />
+                </label>
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      </li>
+    {/each}
+  </ul>
+</main>
 
 <style>
   /* Main Settings Container */
@@ -194,21 +202,21 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    gap:1em;
+    gap: 1em;
   }
 
   /* Settings List Item Input */
   .settings-list-item-input {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.5;
-  color: #333;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+    color: #333;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
 
   .settings-list-item-input:focus {
     outline: none;
@@ -243,7 +251,7 @@
     left: 4px;
     width: 16px;
     height: 16px;
-    background-image: url('../assets/check-solid.svg');
+    background-image: url("../assets/check-solid.svg");
     background-repeat: no-repeat;
     background-size: contain;
     transition: all 0.2s ease-in-out;
@@ -254,7 +262,7 @@
     align-items: center;
   }
 
-  .settings-list-item-label:has(input[type=checkbox]) span {
+  .settings-list-item-label:has(input[type="checkbox"]) span {
     font-size: 16px;
     color: #333;
     text-align: left;
@@ -278,6 +286,4 @@
     outline: none;
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
   }
-
 </style>
-

@@ -6,8 +6,9 @@
   function handleBackButtonClick() {
     // handle back button click here
     if (backButtonVisible) {
-      // go to previous page
-
+      // go to previous page -1
+      nav("home");
+      backButtonVisible = false;
     }
   }
 
