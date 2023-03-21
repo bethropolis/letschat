@@ -208,6 +208,7 @@
   /* Settings List Item Input */
   .settings-list-item-input {
     display: block;
+    border: none;
     width: 100%;
     padding: 10px;
     font-size: 16px;

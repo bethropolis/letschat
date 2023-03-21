@@ -4,8 +4,8 @@
   import { makeRequest } from "../api.js";
   import { DB } from "../db.js";
   const userData = {
-    name: "test",
-    pass: "Bethro77",
+    name: "",
+    pass: "",
     email: "",
   };
   let type = "login";
