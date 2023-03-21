@@ -1,5 +1,6 @@
 <script>
   import Footer from "./footer.svelte";
+  import Posts from "./home-post.svelte";
   export let page;  // declare the page prop
   const activePage = "home"
   function updatePage(newPage) {
@@ -9,10 +10,9 @@
 </script>
 
 <main>
+  <Posts />
   <Footer activePage={activePage} on:updatePage={updatePage} />
 </main>
-
-<!-- markup (zero or more items) goes here -->
 
 <style>
   /* your styles go here */

@@ -22,7 +22,7 @@
   {:else if page == 3}
     <Home bind:page />
   {:else if page == 4}
-    <Profile />
+    <Profile bind:page  />
   {:else if page == 5}
     <Settings />
   {:else if page == 6}
@@ -30,11 +30,11 @@
   {:else if page == 7}
     <Post />
   {:else if page == 8}
-    <Search />
+    <Search bind:page  />
   {:else if page == 9}
     <Following />
   {:else if page == 10}
-    <Notification />
+    <Notification bind:page  />
   {:else if page == 11}
     <Comment />
   {:else if page == 12}
@@ -44,7 +44,8 @@
 
 <style>
   main {
-    height: 100vh;
-    background: #a89ef5;
+    height: 100%;
+    /* background: #a89ef5; */
+
   }
 </style>

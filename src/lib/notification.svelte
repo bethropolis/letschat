@@ -1,7 +1,7 @@
 <script>
     import Footer from "./footer.svelte";
     export let page;  // declare the page prop
-    const activePage = "notification"
+    const activePage = "notifications"
     function updatePage(newPage) {
       console.log(newPage.detail)
       page = newPage.detail; // update the page prop with the new value

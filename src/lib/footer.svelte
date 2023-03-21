@@ -15,7 +15,7 @@
     <a
       class:selected={activePage === "home"}
       href="#"
-      on:click|preventDefault={() => setActivePage("home", 1)}
+      on:click|preventDefault={() => setActivePage("home", 3)}
     >
       <i class="fas fa-home" />
       <span>Home</span>
@@ -50,9 +50,17 @@
 </main>
 
 <style>
+  * {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -moz-tap-highlight-color: transparent;
+  -moz-tap-highlight-color: rgba(0,0,0,0);
+  -o-tap-highlight-color: transparent;
+  -o-tap-highlight-color: rgba(0,0,0,0);
+}
   main {
     position: relative;
-    height: 100vh;
+    height: fit-content;
     overflow: hidden;
   }
 
@@ -79,10 +87,12 @@
     color: #aaa;
     font-size: 12px;
     text-decoration: none;
+     user-select: none;
   }
 
   a i {
     font-size: 20px;
+    user-select: none;
   }
 
   a span {
@@ -92,4 +102,5 @@
   a.selected {
     color: #a89ef5;
   }
+  
 </style>
