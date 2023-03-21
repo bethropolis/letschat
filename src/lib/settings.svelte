@@ -1,6 +1,7 @@
 
 <!-- Settings.svelte -->
 <script>
+  import Header from "./header.svelte";
   let user = {
     name: "John Doe",
     email: "johndoe@example.com",
@@ -58,9 +59,8 @@
     ],
   };
 </script>
-
+<Header />
 <!-- Settings.svelte -->
-<template>
   <main class="settings">
     <header class="settings-header">
       <div class="settings-header-avatar">
@@ -80,7 +80,7 @@
               <li class="settings-list-item">
                 {#if item.type === 'checkbox'}
                   <label class="settings-list-item-label">
-                    <input class="settings-list-item-checkbox" type="checkbox" checked={item.value} />
+                    <input class="settings-list-item-checkbox" type="checkbox" checked={Boolean(item.value)}/>
                     <span>{item.label}</span>
                   </label>
                 {:else if item.type === 'select'}
@@ -105,7 +105,6 @@
       {/each}
     </ul>
   </main>
-</template>
 
 <style>
   /* Main Settings Container */
@@ -195,17 +194,21 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    gap:1em;
   }
 
   /* Settings List Item Input */
   .settings-list-item-input {
-    width: 100%;
-    padding: 5px;
-    border: none;
-    border-radius: 5px;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+  color: #333;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
 
   .settings-list-item-input:focus {
     outline: none;
@@ -214,7 +217,52 @@
 
   /* Settings List Item Checkbox */
   .settings-list-item-checkbox {
-    margin-right: 10px;
+    position: relative;
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    border: 2px solid #aaa;
+    border-radius: 50%;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .settings-list-item-checkbox:checked {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .settings-list-item-checkbox:checked:after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 16px;
+    height: 16px;
+    background-image: url('../assets/check-solid.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .settings-list-item-label {
+    display: flex;
+    align-items: center;
+  }
+
+  .settings-list-item-label:has(input[type=checkbox]) span {
+    font-size: 16px;
+    color: #333;
+    text-align: left;
+    width: 100%;
+  }
+
+  .settings-list-item-checkbox:hover {
+    cursor: pointer;
   }
 
   /* Settings List Item Select */
@@ -230,5 +278,6 @@
     outline: none;
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
   }
+
 </style>
 

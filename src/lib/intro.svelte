@@ -1,12 +1,7 @@
 <script>
+import { Link } from 'svelte-routing';
 import image from "../assets/chat.svg"
-
-
-function handleLogin() {
-    page = 2;
-}
-
-export let page;	
+	
 </script>
 
 <main>
@@ -15,7 +10,7 @@ export let page;
 	</div>
 	<div class="text">
 		<p>welcome to suplike chat app, connecting you with the people around you</p>
-		<button class="btn" on:click={handleLogin}>get started</button>
+		<Link class="btn" to="/login">get started</Link>
 	</div>
 </main>
 <style>

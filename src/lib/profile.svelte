@@ -1,5 +1,6 @@
 <script>
     import Footer from "./footer.svelte";
+    import Header from "./header.svelte";
     export let page;  // declare the page prop
     const activePage = "profile"
     function updatePage(newPage) {
@@ -9,6 +10,7 @@
   </script>
   
   <main>
+    <Header />
     <Footer activePage={activePage} on:updatePage={updatePage} />
   </main>
   

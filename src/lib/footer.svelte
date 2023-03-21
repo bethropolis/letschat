@@ -1,13 +1,12 @@
 <script>
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
+  import { nav } from "../route.js";
   export let activePage = "";
 
   function setActivePage(ispage, num) {
     activePage = ispage;
-    dispatch('updatePage', num);
+    nav(ispage);
   }
+  export { setActivePage };
 </script>
 
 <main>
@@ -31,7 +30,7 @@
     <a
       class:selected={activePage === "notifications"}
       href="#"
-      on:click|preventDefault={() => setActivePage("notifications", 10)}
+      on:click|preventDefault={() => setActivePage("notification", 10)}
     >
       <i class="fas fa-bell" />
       <span>Notifications</span>
@@ -51,13 +50,13 @@
 
 <style>
   * {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-  -moz-tap-highlight-color: transparent;
-  -moz-tap-highlight-color: rgba(0,0,0,0);
-  -o-tap-highlight-color: transparent;
-  -o-tap-highlight-color: rgba(0,0,0,0);
-}
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -moz-tap-highlight-color: transparent;
+    -moz-tap-highlight-color: rgba(0, 0, 0, 0);
+    -o-tap-highlight-color: transparent;
+    -o-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
   main {
     position: relative;
     height: fit-content;
@@ -87,7 +86,7 @@
     color: #aaa;
     font-size: 12px;
     text-decoration: none;
-     user-select: none;
+    user-select: none;
   }
 
   a i {
@@ -102,5 +101,4 @@
   a.selected {
     color: #a89ef5;
   }
-  
 </style>
