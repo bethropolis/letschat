@@ -11,7 +11,7 @@
   import Notification from "./lib/notification.svelte";
   import Comment from "./lib/comment.svelte";
   import List from "./lib/list.svelte";
-  let page = 3;
+  let page = 5;
 </script>
 
 <main>
@@ -44,8 +44,12 @@
 
 <style>
   main {
+<<<<<<< HEAD
     height: 100%;
     /* background: #a89ef5; */
 
+=======
+    height: 100vh;
+>>>>>>> add8694c2d201645a800906c549c22c78a5f8fde
   }
 </style>

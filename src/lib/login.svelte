@@ -1,7 +1,6 @@
 <script>
 import { makeRequest } from '../api.js';
 import { DB } from '../db.js';
-import { onMount } from 'svelte';
 export let page;	
 const userData = { 
     name: 'test',
