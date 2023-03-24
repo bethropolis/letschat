@@ -1,6 +1,7 @@
 <!-- Settings.svelte -->
 <script>
   import Header from "./header.svelte";
+  const title = "settings";
   let user = {
     name: "John Doe",
     email: "johndoe@example.com",
@@ -19,7 +20,7 @@
             value: "johndoe",
           },
           {
-            type: "email",
+            type: "textarea",
             label: "Email",
             value: "johndoe@example.com",
           },
@@ -59,7 +60,7 @@
   };
 </script>
 
-<Header />
+<Header {title} />
 <!-- Settings.svelte -->
 <main class="settings">
   <header class="settings-header">
@@ -95,6 +96,23 @@
                       <option value={option.value}>{option.label}</option>
                     {/each}
                   </select>
+                </label>
+              {:else if item.type === "date"}
+                <label class="settings-list-item-label">
+                  <span>{item.label}</span>
+                  <input
+                    class="settings-list-item-date"
+                    type="date"
+                    value={item.value}
+                  />
+                </label>
+              {:else if item.type === "textarea"}
+                <label class="settings-list-item-label">
+                  <span>{item.label}</span>
+                  <textarea
+                    class="settings-list-item-textarea"
+                    value={String(item.value)}
+                  />
                 </label>
               {:else}
                 <label class="settings-list-item-label">
@@ -218,7 +236,34 @@
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
   }
-
+/* settings List Item textarea  */
+  .settings-list-item-textarea {
+    display: block;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+    color: #333;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    outline: none;
+  }
+  /* date */
+  .settings-list-item-date {
+    display: block;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+    color: #333;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    outline: none;
+  }
   .settings-list-item-input:focus {
     outline: none;
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);

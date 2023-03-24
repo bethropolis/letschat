@@ -20,6 +20,7 @@
     <Route path="/login" component={Login} />
     <Route path="/home" component={Home} />
     <Route path="/profile" component={Profile} />
+    <Route path="/profile/:username" component={Profile} />
     <Route path="/settings" component={Settings} />
     <Route path="/chat" component={Chat} />
     <Route path="/post" component={Post} />
@@ -32,13 +33,23 @@
 </main>
 
 <style>
-  :root {
+  @font-face {
+  font-family: 'Roboto';
+  src: url('assets/roboto/Roboto-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: regular;
+  }
+  :global(:root) {
     --color-primary: #6c5ce7;
     --color-accent: rgba(50, 159, 192, 0.844);
     --color-gray: #ccc;
     --spacing-small: 1rem;
     --spacing-medium: 2rem;
     --spacing-large: 3rem;
+    --font: 'Roboto', sans-serif;
+  }
+  :global(main){
+    font-family: var(--font);
   }
 </style>
 

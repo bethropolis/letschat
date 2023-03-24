@@ -99,6 +99,6 @@
   }
 
   a.selected {
-    color: #a89ef5;
+    color: var(--color-primary);
   }
 </style>

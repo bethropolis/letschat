@@ -21,12 +21,25 @@ export function isLoggedIn() {
   return localStorage.getItem("login");
 }
 
-export function isCurrentPage(location) {
+export function isCurrentPage(location, param = null) {
   // check if the current route is location  else return false
-  if (window.location.pathname === `/${location}`) {
-    return true;
-  } else {
-    return false;
+  if (window.location.pathname !== `/${location}`) return;
+  // check if the current route has a parameter
+  if (param) {
+    let url = new URLSearchParams(window.location.search);
+    if (!url.has(param))  return
+      return true
+  }
+  return true;
+}
+
+// chech params
+export function checkParams(param = null) {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (param) {
+    if (!urlParams.has(param)) return;
+    return urlParams.get(param);
   }
 }
+
 

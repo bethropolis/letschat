@@ -3,11 +3,12 @@
   import { onMount } from "svelte";
   import { nav,isCurrentPage } from "../route.js";
   let backButtonVisible = false;
+  export let title = ""
   function handleBackButtonClick() {
     // handle back button click here
     if (backButtonVisible) {
       // go to previous page -1
-      nav("home");
+      history.back()
       backButtonVisible = false;
     }
   }
@@ -30,7 +31,7 @@
     </button>
   {/if}
 
-  <h1 class="header-title">My App</h1>
+  <h1 class="header-title">{title}</h1>
 
   <div class="header-icon">
     <!-- if profile page show the settings icon -->
@@ -49,9 +50,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px;
+    padding: 1vh;
     background-color: #fff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); */
   }
 
   .back-button {
@@ -64,8 +65,10 @@
   }
 
   .header-title {
-    font-size: 24px;
-    font-weight: bold;
+    font-size: calc(13px + 1vh);
+    font-weight: 700;
+    font-family: monospace;
+    width: 100%;
     margin: 0;
   }
 
