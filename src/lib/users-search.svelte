@@ -22,7 +22,8 @@
     nav(`/profile/${user.uidusers}`);
   }
 </script>
-
+<main>
+  {#if users}
 <div class="user-list">
   {#each users as user}
     <div
@@ -48,8 +49,22 @@
     </div>
   {/each}
 </div>
+{:else}
+  <div class="alert">
+    <i class="fa fa-search"></i>
+    <span>No users found</span>
+  </div>
+{/if}
 
+</main>
 <style>
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
   .user-list {
     display: flex;
     flex-direction: column;

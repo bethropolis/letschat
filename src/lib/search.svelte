@@ -19,6 +19,7 @@
 
   if (checkParams("q")) {
     search = checkParams("q");
+    activetab = "posts";
     doSearch();
   }
 </script>
