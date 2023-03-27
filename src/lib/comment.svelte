@@ -182,7 +182,7 @@
     border-radius: 0.25rem;
     border: none;
     background-color: var(--color-primary);
-    color: #fff;
+    color: var(--color-light);
     cursor: pointer;
     max-width: 200px;
     transition: all 0.5s ease;

@@ -2,11 +2,19 @@
 <script>
   import { onMount } from "svelte";
   import { nav,isCurrentPage } from "../route.js";
+  export let navOptions = []
+  export let title = "";
+  export let backTo = "";
+  export let locked = false;
   let backButtonVisible = false;
-  export let title = ""
-  function handleBackButtonClick() {
+
+  function handleBackButtonClick(to) {
     // handle back button click here
-    if (backButtonVisible) {
+    if(to !== "") {
+       nav(to)
+      }
+
+    if (backButtonVisible && !to) {
       // go to previous page -1
       history.back()
       backButtonVisible = false;
@@ -16,32 +24,30 @@
   onMount(() => {
     // check if the current route is not the home page
     // if not, show the back button
-    if (window.location.pathname !== "/") {
+    if (!isCurrentPage("home")) {
       backButtonVisible = true;
     }
   });
-
-  console.log(window.location.pathname);
 </script>
 
-<main>
+<main class:locked>
   {#if backButtonVisible}
-    <button class="back-button" on:click={handleBackButtonClick}>
+    <button class="back-button" on:click={()=>{handleBackButtonClick(backTo)}}>
       <span class="fas fa-chevron-left" />
     </button>
   {/if}
 
-  <h1 class="header-title">{title}</h1>
+  <h1 class="header-title">{@html title}</h1>
 
   <div class="header-icon">
     <!-- if profile page show the settings icon -->
-    {#if isCurrentPage("profile")}
-      <i class="fas fa-cog" on:click={() => nav("settings")} />
+   
+    {#if  navOptions.length > 0}
+      {#each navOptions as option}
+        <i class= {option.icon} on:click={() => nav(option.link)} />
+      {/each}
     {/if}
-    <!-- settings page show home -->
-    {#if isCurrentPage("settings")}
-      <i class="fas fa-home" on:click={() => nav("home")} />
-    {/if}
+
   </div>
 </main>
 
@@ -51,8 +57,13 @@
     align-items: center;
     justify-content: space-between;
     padding: 1vh;
-    background-color: #fff;
-    /* box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); */
+    background-color: var(--color-light);
+    z-index: 100;
+    /* ; */
+  }
+  .locked{
+    position: sticky;
+    top: 0;
   }
 
   .back-button {
@@ -60,7 +71,7 @@
     background-color: transparent;
     cursor: pointer;
     font-size: 18px;
-    color: #000;
+    color: var(--color-text);
     margin-right: 10px;
   }
 
@@ -73,8 +84,13 @@
   }
 
   .header-icon {
-    font-size: 18px;
-    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: right; 
+    margin-right: .2em;
+    gap: 1.33em;
+    font-size: 1.33em;
+    color: var(--color-icon);
     cursor: pointer;
   }
 </style>

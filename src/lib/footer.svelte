@@ -9,7 +9,8 @@
   export { setActivePage };
 </script>
 
-<main>
+<main>  
+  <!-- svelte-ignore component-name-lowercase -->
   <nav>
     <a
       class:selected={activePage === "home"}
@@ -72,7 +73,7 @@
     left: 0;
     right: 0;
     height: 60px;
-    background-color: #fff;
+    background-color: var(--color-light);
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
   }
 

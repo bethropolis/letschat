@@ -88,7 +88,7 @@ main {
 }
 
 .post {
-  background-color: #FFFFFF;
+  background-color: var(--color-light);
   border-radius: 10px;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
   margin-bottom: 20px;
@@ -141,7 +141,7 @@ main {
 }
 
 .dropdown ul {
-  background-color: #FFFFFF;
+  background-color: var(--color-light);
   border: 1px solid #E2E2E2;
   border-radius: 5px;
   display: none;

@@ -23,12 +23,12 @@
     <Route path="/profile/:username" component={Profile} />
     <Route path="/settings" component={Settings} />
     <Route path="/chat" component={Chat} />
+    <Route path="/chat/:username" component={Chat} />
     <Route path="/post" component={Post} />
     <Route path="/search" component={Search} />
     <Route path="/following" component={Following} />
     <Route path="/notification" component={Notification} />
     <Route path="/comment" component={Comment} />
-    <Route path="/list" component={List} />
   </Router>
 </main>
 
@@ -43,6 +43,10 @@
     --color-primary: #6c5ce7;
     --color-accent: rgba(50, 159, 192, 0.844);
     --color-gray: #ccc;
+    --color-light: #fff;
+    --color-icon: #3f3f3f;
+    --color-text: #1f1f1f;
+    --color-text-light: #858585;
     --spacing-small: 1rem;
     --spacing-medium: 2rem;
     --spacing-large: 3rem;
@@ -51,5 +55,5 @@
   :global(main){
     font-family: var(--font);
   }
-</style>
+  </style>
 

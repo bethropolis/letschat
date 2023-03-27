@@ -20,6 +20,13 @@
     bio: "What's popping, am a waifu bot. ",
     date_joined: "2020-12-16",
   };
+ let navOptions = [ 
+  {
+    title: "chat",
+    icon: "fas fa-cog",
+    link: "/settings"
+  }
+  ]
   function updatePage(newPage) {
     console.log(newPage.detail);
     page = newPage.detail; // update the page prop with the new value
@@ -27,7 +34,7 @@
 </script>
 
 <main>
-  <Header title={username} />
+  <Header title={username} {navOptions}/>
 
   <div class="container">
     <div class="profile-details">
@@ -129,7 +136,7 @@
     max-width: 700px;
     margin-bottom: 20px;
     padding: 20px;
-    background-color: #fff;
+    background-color: var(--color-light);
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.07);
     border-radius: 10px;
     text-align: center;
@@ -173,7 +180,7 @@
     align-items: center;
     font-size: 16px;
     font-weight: bold;
-    color: #fff;
+    color: var(--color-light);
     background-color: var(--color-primary);
     border: none;
     border-radius: calc(2em + 4vw);
@@ -191,7 +198,7 @@
     outline-offset: -2px;
   }
   .unfollow {
-    background-color: #fff;
+    background-color: var(--color-light);
     color: var(--color-primary);
     border: 1px solid var(--color-primary);
     transition: all 0.2s ease-in-out;

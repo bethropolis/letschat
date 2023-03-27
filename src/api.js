@@ -1,7 +1,7 @@
+import config from "./app.json"
 import axios from 'axios';
-
-const BASE_URL = 'https://bethro.alwaysdata.net/api/v1';
-const api_token = 'b2f4cb3083ca8588a5a6ca1dbd97e1f5947fefac3ecd76ff10b98400f1e3e7b0';
+const BASE_URL = config.base_url;
+const api_token = config.api_key;
 export async function makeRequest(endpoint, method, data = {}, headers = {}) {
   const url = new URL(`${BASE_URL}/${endpoint}/`);
   url.searchParams.append("api_key", api_token);

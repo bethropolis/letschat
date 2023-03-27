@@ -20,7 +20,7 @@
             value: "johndoe",
           },
           {
-            type: "textarea",
+            type: "input",
             label: "Email",
             value: "johndoe@example.com",
           },
@@ -272,9 +272,8 @@
   /* Settings List Item Checkbox */
   .settings-list-item-checkbox {
     position: relative;
-    width: 24px;
-    height: 24px;
-    margin-right: 12px;
+    width: 26px;
+    height: 26px;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -293,10 +292,11 @@
   .settings-list-item-checkbox:checked:after {
     content: "";
     position: absolute;
-    top: 4px;
-    left: 4px;
+    top: 12%;
+    left: 13%;
     width: 16px;
     height: 16px;
+    padding: 0;
     background-image: url("../assets/check-solid.svg");
     background-repeat: no-repeat;
     background-size: contain;

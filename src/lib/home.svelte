@@ -1,17 +1,25 @@
 <script>
   import Footer from "./footer.svelte";
   import Posts from "./home-post.svelte";
-  export let page;  // declare the page prop
-  const activePage = "home"
-  function updatePage(newPage) {
-    console.log(newPage.detail)
-    page = newPage.detail; // update the page prop with the new value
+  import Header from "./header.svelte";
+  // chat,make post pages
+  let navOptions = [{
+    title: "make post",
+    icon: "fas fa-plus",
+    link: "/post"
+  }, {
+    title: "chat",
+    icon: "fas fa-comment",
+    link: "/chat"
   }
+  ]
+  const activePage = "home"
 </script>
 
 <main>
-  <Posts />
-  <Footer activePage={activePage} on:updatePage={updatePage} />
+  <Header {navOptions} />
+  <!-- <Posts /> -->
+  <Footer activePage={activePage} />
 </main>
 
 <style>
