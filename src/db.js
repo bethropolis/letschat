@@ -1,4 +1,4 @@
-import swal from 'sweetalert';
+import Snackbar from "./lib/ui/snackbar.svelte";
 export function DB(type, key, data = '') {
    if (type === 'get') {
     if (data) {
@@ -15,10 +15,12 @@ export function DB(type, key, data = '') {
   } else if (type === 'clear') {
     localStorage.clear();
   } else {
-    swal({
-  title: "error",
-  text: "failed stora",
-  icon: "error",
-});
+    const myComponent = new Snackbar({
+      target: document.body,
+      props: {
+        msg: "failed local storage"
+      }
+    });
   }
 } 
+

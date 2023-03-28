@@ -1,4 +1,5 @@
 <script>
+  import ModalBottom from "./ui/modalBottom.svelte";
   import { makeRequest } from "../api";
   import { nav } from "../route";
   let chats = [
@@ -71,6 +72,11 @@
   function letsChat(user) {
     nav(`/chat/${user}`);
   }
+  let isSheetOpen = false;
+  
+  const toggleSheet = () => {
+    isSheetOpen = !isSheetOpen;
+  };
 
   $: users = chats.filter((chat) =>
     chat.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -118,6 +124,26 @@
       <p>There are no users found for query: {searchQuery}</p>
     {/if}
   </div>
+  <button on:click={toggleSheet}>Toggle Sheet</button>
+
+  <ModalBottom isOpen={isSheetOpen}>
+    <div class="share-options">
+      <button class="share-option" type="button">
+        <img src="facebook-icon.png" alt="Share on Facebook">
+        <span>Share on Facebook</span>
+      </button>
+      <button class="share-option" type="button">
+        <img src="twitter-icon.png" alt="Share on Twitter">
+        <span>Share on Twitter</span>
+      </button>
+      <button class="share-option" type="button">
+        <i class="fas fa-twitter"></i>
+        <span>Share on Instagram</span>
+      </button> 
+      <!-- add more social media sharing options here -->
+    </div>
+  </ModalBottom>
+  
 </main>
 
 <style>
@@ -200,5 +226,43 @@
   .last-message {
     font-size: 14px;
     color: #9b9b9b;
+  }
+
+  
+
+  .share-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 20px 0;
+  }
+
+  .share-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+    margin: 0 10px 10px 0;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-out;
+  }
+
+  .share-option:hover {
+    background-color: #e6e6e6;
+  }
+
+  .share-option i {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+  }
+
+  .share-option span {
+    font-size: 12px;
+    text-align: center;
   }
 </style>

@@ -1,8 +1,9 @@
 <script>
+  import Comment from "./comment.svelte";
   import Header from "./header.svelte";
-  let comments = [
-    {
+  let comments = [{
       id: 1,
+      username: "dddd",
       name: "John Doe",
       avatar: "https://randomuser.me/api/portraits/men/1.jpg",
       comment: "This is a great post!",
@@ -10,6 +11,7 @@
       replies: [
         {
           id: 1,
+          username: "hugga",
           name: "Jane Smith",
           avatar: "https://randomuser.me/api/portraits/women/1.jpg",
           comment: "I totally agree with you!",
@@ -19,18 +21,20 @@
     },
     {
       id: 2,
+      username: "hugga",
       name: "Alice Johnson",
       avatar: "https://randomuser.me/api/portraits/women/2.jpg",
       comment: "Thanks for sharing!",
       date: "2021-08-03",
       replies: [],
-    },
+    }
   ];
   let title = "hello";
   let activePage = "";
-  function addComment() {
-    const name = document.getElementById("name").value;
-    const comment = document.getElementById("comment").value;
+  function addComment(name_, comment_) {
+    const name = name_;
+    const username = "thisguy";
+    const comment = comment_;
     const date = new Date().toISOString().slice(0, 10);
     const avatar = `https://randomuser.me/api/portraits/${
       Math.random() < 0.5 ? "men" : "women"
@@ -40,6 +44,7 @@
       ...comments,
       {
         id: comments.length + 1,
+        username,
         name,
         avatar,
         comment,
@@ -47,14 +52,12 @@
         replies: [],
       },
     ];
-
-    document.getElementById("name").value = "";
-    document.getElementById("comment").value = "";
   }
 
-  function addReply(commentId) {
-    const name = document.getElementById(`name-${commentId}`).value;
-    const comment = document.getElementById(`comment-${commentId}`).value;
+  function addReply(commentId, comment_) {
+    const name = "yakob";
+    const username = "him";
+    const comment = comment_;
     const date = new Date().toISOString().slice(0, 10);
     const avatar = `https://randomuser.me/api/portraits/${
       Math.random() < 0.5 ? "men" : "women"
@@ -65,15 +68,13 @@
       ...comments[commentIndex].replies,
       {
         id: comments[commentIndex].replies.length + 1,
+        username,
         name,
         avatar,
         comment,
         date,
       },
     ];
-
-    document.getElementById(`name-${commentId}`).value = "";
-    document.getElementById(`comment-${commentId}`).value = "";
   }
 </script>
 
@@ -101,27 +102,12 @@
           <small>{comment.date}</small>
           <div class="actions">
             <button
-              on:click={() =>
-                document
-                  .getElementById(`reply-${comment.id}`)
-                  .classList.toggle("hidden")}
-              ><i class="fas fa-reply" /> Reply</button
+              on:click={() => {
+                addReply(comment.id, "hello");
+              }}><i class="fas fa-reply" /> Reply</button
             >
             <button><i class="fas fa-flag" /> Report</button>
           </div>
-          <form
-            on:submit|preventDefault={() => addReply(comment.id)}
-            class="hidden"
-            id={`reply-${comment.id}`}
-          >
-            <label for={`name-${comment.id}`}>Name:</label>
-            <input type="text" id={`name-${comment.id}`} required />
-
-            <label for={`comment-${comment.id}`}>Comment:</label>
-            <textarea id={`comment-${comment.id}`} required />
-
-            <button type="submit">Add Reply</button>
-          </form>
           {#if comment.replies.length > 0}
             <div class="replies">
               {#each comment.replies as reply}
@@ -132,8 +118,14 @@
                     <p>{reply.comment}</p>
                     <small>{reply.date}</small>
                     <div class="actions">
-                      <button><i class="fas fa-reply" /> Reply</button>
-                      <button><i class="fas fa-flag" /> Report</button>
+                      <button
+                        on:click={() => {
+                          addReply(comment.id, `@${reply.username} hello`);
+                        }}
+                      >
+                        <button><i class="fas fa-reply" /> Reply</button>
+                        <button><i class="fas fa-flag" /> Report</button>
+                      </button>
                     </div>
                   </div>
                 </div>

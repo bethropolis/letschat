@@ -18,7 +18,7 @@
 
 <main>
   <Header {navOptions} />
-  <!-- <Posts /> -->
+  <Posts />
   <Footer activePage={activePage} />
 </main>
 

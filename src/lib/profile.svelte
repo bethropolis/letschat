@@ -106,22 +106,21 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
-    color: var(--color-primary);
+    align-items: flex-start;;
   }
 
   .profile-details h2 {
     margin: 0;
     font-size: 24px;
     font-weight: bold;
-    color: #333;
+    color: var(--color-dark);
   }
 
   .profile-details h3 {
     margin: 0;
     font-size: 16px;
     font-weight: normal;
-    color: #555;
+    color: var(--color-gray);
   }
 
   .profile-details .muted {

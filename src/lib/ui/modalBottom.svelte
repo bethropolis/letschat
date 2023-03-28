@@ -8,6 +8,7 @@
 
 <div class="bottom-sheet {isOpen ? 'open' : ''}">
   <div class="bottom-sheet-handle" on:click={toggleSheet} />
+  
   <slot />
 </div>
 
@@ -35,4 +36,5 @@
     margin: 10px auto;
     cursor: pointer;
   }
+
 </style>

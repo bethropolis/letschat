@@ -40,20 +40,32 @@
   font-style: regular;
   }
   :global(:root) {
-    --color-primary: #6c5ce7;
-    --color-accent: rgba(50, 159, 192, 0.844);
+    --color-primary: rgba(152, 158, 240, 0.844);
+    --color-primary-dark: #a068c4;
+    --color-accent: rgba(152, 158, 240, 0.844);
     --color-gray: #ccc;
-    --color-light: #fff;
+    --color-light: #232323;
+    --color-dark: #fff;
     --color-icon: #3f3f3f;
-    --color-text: #1f1f1f;
+    --color-text: #221e1e;
     --color-text-light: #858585;
     --spacing-small: 1rem;
     --spacing-medium: 2rem;
     --spacing-large: 3rem;
     --font: 'Roboto', sans-serif;
   }
-  :global(main){
+  :global(body,main){
+    background-color: var(--color-light);
+    color: var(--color-dark);
     font-family: var(--font);
   }
+  
+  :global(*:focus) {
+  outline: none;
+}
+
+:global(*){
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
   </style>
 

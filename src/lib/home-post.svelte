@@ -1,4 +1,5 @@
 <script>
+  import { DB } from "../db.js";
   import { onMount } from "svelte";
   import { makeRequest } from "../api.js";
 
@@ -6,10 +7,20 @@
   export let posts = [];
 
   onMount(async () => {
-    const { data } = await makeRequest("post", "GET", { user_token });
-    posts = data;
+    const storedTime = DB("get", "homePostTime");
+    const currentTime = new Date().getTime();
+
+    if (!storedTime || currentTime - new Date(storedTime).getTime() > 900000) {
+      const { data } = await makeRequest("post", "GET", { user_token });
+      DB("set", "homePost", data);
+      DB("set", "homePostTime", Date());
+      posts = data;
+    } else {
+      posts = DB("get", "homePost");
+    }
   });
 </script>
+
 
 <main>
     {#each posts as post}
@@ -42,17 +53,13 @@
             class="post-image"
           />
         {:else}
-          <p class="post-text">{post.image_text}</p>
+          <p class="post-text"> {@html post.image_text} </p>
         {/if}
       </div>
       <footer class="post-footer">
         <div class="post-actions">
-          <button class="post-action-button">
-            {#if post.liked}
-              <i class="fas fa-heart post-action-icon" /> Unlike
-            {:else}
-              <i class="far fa-heart post-action-icon" /> Like
-            {/if}
+          <button class="post-action-button" on:click={()=>{post.liked = !post.liked; post.liked?post.post_likes++:post.post_likes--}}>
+              <i class="{post.liked ? "fas":"far"} fa-heart post-action-icon" />{post.post_likes}
           </button>
           <button class="post-action-button">
             <i class="far fa-comment post-action-icon" /> Comment
@@ -64,7 +71,6 @@
             <i class="fas fa-share post-action-icon" /> Share
           </button>
         </div>
-        <p class="post-likes">{post.post_likes} likes</p>
       </footer>
     </article>
   {/each}
@@ -84,7 +90,7 @@ h1, h2, h3, h4, h5, h6 {
 main {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0;
 }
 
 .post {
@@ -175,10 +181,17 @@ main {
   max-width: 100%;
 }
 
-.post-body p {
-  color: #555555;
+.post-text {
+  color: var(--color-dark) !important; 
   font-size: 16px;
   margin: 0;
+}
+
+
+:global(.post-text a){
+  all: none;
+  text-decoration: none;
+  color: var(--color-primary);
 }
 
 .post-footer {
@@ -195,12 +208,15 @@ main {
   font-size: 16px;
 }
 
-.post-footer button:hover {
-  color: #1DA1F2;
+.post-footer button:hover i {
+  color: var(--color-primary);
 }
 
 .post-footer button i {
   margin-right: 5px;
+}
+.post-footer .fa-heart{
+  color: var(--color-primary);
 }
 
 .post-footer p {
