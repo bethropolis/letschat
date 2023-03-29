@@ -79,11 +79,11 @@
   border-radius: 20px;
   font-size: 14px;
   line-height: 1.4;
-  background-color: #d6e4f0;
+  background-color: var(--color-accent-dark);
 }
 
 .receiver .content {
-  color: var(--color-light);
+  color: var(--color-lighter);
   background-color: var(--color-primary);
 }
 

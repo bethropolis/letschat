@@ -43,11 +43,12 @@
     position: fixed;
     display: grid;
     grid-template-columns: repeat(1fr auto,2);
-    background-color: white;
+    background-color: var(--color-light);
     padding: 8px;
     height: fit-content;
-    width: 100%;
-    bottom: 0;
+    width: 95%;
+    bottom: 5px;
+    margin: 0 auto;
   }
 
   .input-wrapper {
@@ -56,7 +57,7 @@
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    background-color: white;
+    background-color: var(--color-input);
     border-radius: 30px;
   }
 
@@ -65,7 +66,7 @@
     justify-content: center;
     align-items: center;
     background-color: transparent;
-    color: #d4d4d4;
+    color: var(--color-dark);
     border: none;
     cursor: pointer;
     margin-right: 8px;
@@ -85,7 +86,7 @@
     justify-content: center;
     align-items: center;
     background-color: var(--color-primary);
-    color: white;
+    color: var(--color-lighter);
     border: none;
     cursor: pointer;
     margin-right: 8px;
@@ -108,7 +109,8 @@
     font-size: 1rem;
     padding: 10px 16px;
     border: none;
-    background-color: #f0f0f0;
+    color: var(--color-dark);
+    background-color: inherit;
     border-radius: 30px;
     outline: none;
     resize: none;

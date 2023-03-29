@@ -1,27 +1,56 @@
 <script>
   import { DB } from "../db.js";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { makeRequest } from "../api.js";
 
   let user_token = "16c78b8e0c126b30749f8d93ad9de7479f7decb572";
-  export let posts = [];
+  let posts = [];
+  let observer;
+  let isLoading = false;
+  let hasMorePosts = true;
+  const loadMorePosts = async () => {
+  if (!hasMorePosts || isLoading) {
+    return;
+  }
+  isLoading = true;
+  const lastPostId = posts.length > 0 ? posts[posts.length - 1].id : 0;
+  const storedData = JSON.parse(DB("get", "homePost")) || { data: [], timestamp: 0 };
+  const fifteenMinutes = 5 * 60 * 1000;
+  if (Date.now() - storedData.timestamp > fifteenMinutes) {
+    // Clear stored data if it's older than 15 minutes
+    DB("set", "homePost", "");
+    storedData.data = [];
+    storedData.timestamp = 0;
+  }
+  const { data: newData } = await makeRequest("post", "GET", { user_token, last_id: lastPostId });
+  const filteredData = newData.filter((post) => !storedData.data.some((p) => p.id === post.id));
+  const data = { data: [...storedData.data, ...filteredData], timestamp: Date.now() };
+  DB("set", "homePost", JSON.stringify(data));
+  posts = data.data;
+  isLoading = false;
+  hasMorePosts = newData.length > 0;
+};
 
-  onMount(async () => {
-    const storedTime = DB("get", "homePostTime");
-    const currentTime = new Date().getTime();
+  onMount(() => {
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    };
 
-    if (!storedTime || currentTime - new Date(storedTime).getTime() > 900000) {
-      const { data } = await makeRequest("post", "GET", { user_token });
-      DB("set", "homePost", data);
-      DB("set", "homePostTime", Date());
-      posts = data;
-    } else {
-      posts = DB("get", "homePost");
-    }
+    observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && posts) {
+        loadMorePosts();
+      }
+    }, options);
+
+    observer.observe(document.querySelector("#load-more"));
+  });
+
+  onDestroy(() => {
+    observer.disconnect();
   });
 </script>
-
-
 <main>
     {#each posts as post}
     <article class="post">
@@ -74,38 +103,40 @@
       </footer>
     </article>
   {/each}
+  <div id="load-more">
+    {#if isLoading}
+      <span class="loader"></span>
+      Loading more posts...
+    {:else}
+      Scroll down to load more posts
+    {/if}
+  </div>
 </main>
 
 <style>
- /* Font styles */
-body {
-  font-family: 'Open Sans', sans-serif;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-}
 
 /* Main component styles */
 main {
   max-width: 800px;
-  margin: 0 auto;
+  padding: 20px 10px;
+  margin: 5px auto 5em;
   padding: 0;
 }
 
 .post {
-  background-color: var(--color-light);
-  border-radius: 10px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+  background-color: var(--color-post);
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.09);
   margin-bottom: 20px;
-  padding: 20px;
+  padding: 20px 10px;
+  margin: 10px auto;
+  position: relative;
 }
 
 .post-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 15px;
+  margin: 15px 0;
 }
 
 .post-header img {
@@ -225,5 +256,31 @@ main {
   margin: 0;
   text-align: right;
 }
+#load-more {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #999;
+  }
+
+  #load-more .loader {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    border-top-color: #333;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 10px;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
 </style>

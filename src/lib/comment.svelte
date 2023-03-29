@@ -1,6 +1,6 @@
 <script>
-  import Comment from "./comment.svelte";
   import Header from "./header.svelte";
+  import ModalBottom from "./ui/modalBottom.svelte";
   let comments = [{
       id: 1,
       username: "dddd",
@@ -80,15 +80,7 @@
 
 <main>
   <Header {title} />
-  <form on:submit|preventDefault={addComment}>
-    <label for="name">Name:</label>
-    <input type="text" id="name" required />
-
-    <label for="comment">Comment:</label>
-    <textarea id="comment" required />
-
-    <button type="submit">Add Comment</button>
-  </form>
+ 
 
   {#if comments.length === 0}
     <p>No comments yet.</p>
@@ -122,10 +114,8 @@
                         on:click={() => {
                           addReply(comment.id, `@${reply.username} hello`);
                         }}
-                      >
-                        <button><i class="fas fa-reply" /> Reply</button>
+                      ><i class="fas fa-reply" /> Reply</button>
                         <button><i class="fas fa-flag" /> Report</button>
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -136,15 +126,34 @@
       </div>
     {/each}
   {/if}
+
+    
+  <ModalBottom>
+    <form on:submit|preventDefault={addComment}>
+      <label for="comment">Comment:</label>
+      <textarea id="comment" required placeholder="enter your coment..." />
+  
+      <button type="submit">Add Comment</button>
+    </form>
+    </ModalBottom>
+
 </main>
 
 <style>
+
   main {
     margin: 0 auto;
+    max-width: 800px;
+    background-color: var(--color-light);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
   }
 
   h1 {
     text-align: center;
+    margin-top: 0;
+    margin-bottom: 2rem;
+    color: var(--color-primary);
   }
 
   form {
@@ -152,20 +161,25 @@
     flex-direction: column;
     gap: 1rem;
     margin-bottom: 2rem;
-    width: 90vw;
-    margin: 0 auto;
   }
 
   label {
     font-weight: bold;
+    margin-bottom: 0.5rem;
   }
 
   input,
   textarea {
     padding: 0.5rem;
+    margin: 0 auto;
     border-radius: 0.25rem;
     outline: none;
-    border: 1px solid #ccc;
+    border: none;
+    width: calc(100vw - 20%);
+    font-size: 1rem;
+    color: var(--color-dark);
+    background-color: var(--color-input);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
 
   button {
@@ -178,6 +192,9 @@
     cursor: pointer;
     max-width: 200px;
     transition: all 0.5s ease;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: bold;
   }
 
   button:hover {
@@ -206,12 +223,14 @@
 
   h3 {
     margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    color: var(--color-text);
   }
 
   .replies {
     margin-top: 1rem;
     padding-left: 2rem;
-    border-left: 1px solid #ccc;
+    border-left: 1px solid var(--color-gray);
   }
 
   .reply {
@@ -223,11 +242,23 @@
   .reply img {
     width: 40px;
     height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .actions {
+    display: flex;
   }
   .actions button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
     background: transparent;
-    color: #777;
+    color: var(--color-text-light);
+    font-size: 1rem;
+    font-weight: bold;
   }
+
   .reply-body {
     display: flex;
     flex-direction: column;
@@ -237,13 +268,17 @@
 
   h4 {
     margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: var(--color-text);
   }
 
   small {
-    color: #777;
+    color: var(--color-gray);
+    font-size: 0.8rem;
   }
 
   .hidden {
     display: none;
   }
+
 </style>

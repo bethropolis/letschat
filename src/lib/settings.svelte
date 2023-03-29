@@ -1,68 +1,130 @@
-<!-- Settings.svelte -->
 <script>
+  import { nav } from "../route";
+  import { DB } from "../db";
   import Header from "./header.svelte";
+  import Snack from "./ui/snackbar.svelte";
+
   const title = "settings";
+  let msg = "hey";
   let user = {
     name: "John Doe",
     email: "johndoe@example.com",
     avatar: "https://via.placeholder.com/150",
   };
 
-  let settingsPage = {
-    pageTitle: "Settings",
-    sections: [
-      {
-        title: "General",
-        items: [
-          {
-            type: "text",
-            label: "Username",
-            value: "johndoe",
-          },
-          {
-            type: "input",
-            label: "Email",
-            value: "johndoe@example.com",
-          },
-          {
-            type: "password",
-            label: "Password",
-            value: "",
-          },
-          {
-            type: "checkbox",
-            label: "Send me promotional emails",
-            value: true,
-          },
-        ],
-      },
-      {
-        title: "Privacy",
-        items: [
-          {
-            type: "select",
-            label: "Who can see your profile?",
-            value: "everyone",
-            options: [
-              { label: "Everyone", value: "everyone" },
-              { label: "Only Friends", value: "friends" },
-              { label: "Only Me", value: "me" },
-            ],
-          },
-          {
-            type: "checkbox",
-            label: "Show my online status",
-            value: false,
-          },
-        ],
-      },
-    ],
-  };
+  const settingsPage = {
+  header: {
+    avatar: "https://via.placeholder.com/80",
+    title: "Settings",
+    subtitle: "Configure your account settings"
+  },
+  sections: [
+    {
+      title: "Account",
+      items: [
+        {
+          type: "input",
+          label: "Username",
+          value: "johndoe",
+          icon: "fas fa-user",
+          action: {
+            type: "func",
+            name: "updateUsername"
+          }
+        },
+        {
+          type: "input",
+          label: "Email",
+          value: "johndoe@example.com",
+          icon: "fas fa-envelope",
+          action: {
+            type: "func",
+            name: "updateEmail"
+          }
+        },
+        {
+          type: "input",
+          label: "Password",
+          value: "",
+          icon: "fas fa-lock",
+          action: {
+            type: "func",
+            name: "updatePassword"
+          }
+        }
+      ]
+    },
+    {
+      title: "Notifications",
+      items: [
+        {
+          type: "checkbox",
+          label: "Email Notifications",
+          value: true,
+          icon: "fas fa-envelope",
+          action: {
+            type: "func",
+            name: "toggleEmailNotifications"
+          }
+        },
+        {
+          type: "checkbox",
+          label: "Push Notifications",
+          value: false,
+          icon: "fas fa-bell",
+          action: {
+            type: "func",
+            name: "togglePushNotifications"
+          }
+        }
+      ]
+    },
+    {
+      title: "Appearance",
+      items: [
+        {
+          type: "select",
+          label: "Theme",
+          value: "light",
+          icon: "fas fa-palette",
+          options: [
+            { label: "Light", value: "light" },
+            { label: "Dark", value: "dark" }
+          ],
+          action: {
+            type: "func",
+            name: "changeTheme"
+          }
+        },
+        {
+          type: "li",
+          label: "Change Avatar",
+          icon: "fas fa-camera",
+          action: {
+            type: "func",
+            name: "changeAvatar"
+          }
+        }
+      ]
+    }
+  ]
+};
+
+  function logOut() {
+    DB("remove","token")
+    DB("remove","login")
+    msg = "you have successfully logged out";
+    nav('login')
+  }
+  function codeEval(data){
+    if (data == "logOut") return logOut();
+  }
 </script>
 
-<Header {title} />
+<!-- Settings.svelte -->
 <!-- Settings.svelte -->
 <main class="settings">
+  <Header {title} />
   <header class="settings-header">
     <div class="settings-header-avatar">
       <img src={user.avatar} alt="User Avatar" />
@@ -70,12 +132,10 @@
     <h1 class="settings-header-title">{user.name}</h1>
     <p class="settings-header-subtitle">{user.email}</p>
   </header>
-
   <ul class="settings-list">
     {#each settingsPage.sections as section}
       <li class="settings-list-section">
         <h2 class="settings-list-section-title">{section.title}</h2>
-
         <ul class="settings-list-items">
           {#each section.items as item}
             <li class="settings-list-item">
@@ -114,6 +174,14 @@
                     value={String(item.value)}
                   />
                 </label>
+              {:else if item.type === "li"}
+                <li
+                  class="settings-list-item-li"
+                  on:click={()=>{codeEval(item.action.name)}}
+                >
+                  <span>{item.label}</span>
+                  <i class={item.icon} />
+                </li>
               {:else}
                 <label class="settings-list-item-label">
                   <span>{item.label}</span>
@@ -130,6 +198,7 @@
       </li>
     {/each}
   </ul>
+  <Snack bind:msg />
 </main>
 
 <style>
@@ -137,7 +206,7 @@
   .settings {
     max-width: 500px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 0 10px;
   }
 
   /* Settings Header */
@@ -189,7 +258,7 @@
   }
 
   .settings-list-section-title {
-    font-size: 24px;
+    font-size: 24px; 
     margin-bottom: 10px;
   }
 
@@ -236,7 +305,8 @@
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
   }
-/* settings List Item textarea  */
+
+  /* settings List Item textarea  */
   .settings-list-item-textarea {
     display: block;
     border: none;
@@ -250,6 +320,7 @@
     transition: all 0.3s ease;
     outline: none;
   }
+
   /* date */
   .settings-list-item-date {
     display: block;
@@ -264,6 +335,7 @@
     transition: all 0.3s ease;
     outline: none;
   }
+
   .settings-list-item-input:focus {
     outline: none;
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
@@ -331,5 +403,36 @@
   .settings-list-item-select:focus {
     outline: none;
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Settings List Item Li */
+  .settings-list-item-li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .settings-list-item-li:hover {
+    background-color: var(--color-gray);
+  }
+
+  .settings-list-item-li i {
+    margin-left: 10px;
+    flex-grow: 2;
+  }
+
+  .settings-list-item-li span {
+    font-size: 16px;
+    color: #333;
+    text-align: left;
+    width: 100%;
+    margin-right: 10px;
+    flex-grow: 1;
   }
 </style>

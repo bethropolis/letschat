@@ -1,60 +1,12 @@
 <script>
+  import { onMount } from "svelte";
   import ModalBottom from "./ui/modalBottom.svelte";
-  import { makeRequest } from "../api";
   import { nav } from "../route";
-  let chats = [
-    {
-      name: "steven webb",
-      username: "bob",
-      image: "https://example.com/1",
-      msg: "Okay, see you there than!",
-      time: "14:24",
-    },
-    {
-      name: "jane doe",
-      image: "https://example.com/2",
-      msg: "Just finished my workout!",
-      time: "10:45",
-    },
-    {
-      name: "john doe",
-      image: "https://example.com/3",
-      msg: "Let's grab a coffee later",
-      time: "09:12",
-    },
-    {
-      name: "maria garcia",
-      image: "https://example.com/4",
-      msg: "Can you send me the details?",
-      time: "yesterday",
-    },
-    {
-      name: "jason smith",
-      image: "https://example.com/5",
-      msg: "Happy birthday!",
-      time: "2 days ago",
-    },
-    {
-      name: "susan brown",
-      image: "https://example.com/6",
-      msg: "Looking forward to seeing you!",
-      time: "3 days ago",
-    },
-    {
-      name: "peter parker",
-      image: "https://example.com/7",
-      msg: "Thanks for the help!",
-      time: "last week",
-    },
-  ];
-  let users = [];
-  let navOptions = [
-    {
-      title: "home",
-      icon: "fas fa-home",
-      link: "/home",
-    },
-  ];
+  import { formatTime } from "../extra";
+  import { DB } from "../db";
+
+  export let chats = [];
+  export let users = [];
   let searchActive = true;
   let searchQuery = "";
 
@@ -73,13 +25,18 @@
     nav(`/chat/${user}`);
   }
   let isSheetOpen = false;
-  
+
   const toggleSheet = () => {
     isSheetOpen = !isSheetOpen;
   };
+  onMount(() => {
+    if (DB("get", "ChatList")) {
+      chats = DB("get", "ChatList");
+    }
+  });
 
   $: users = chats.filter((chat) =>
-    chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    chat.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
 </script>
 
@@ -109,13 +66,25 @@
         <div
           class="item"
           on:click={() => {
-            letsChat(chat.name);
+            letsChat(chat.username);
           }}
         >
-          <img src={chat.image} alt="" class="avatar" />
-          <div>
-            <h3 class="name">{chat.name}</h3>
-            <span class="last-message">{chat.msg} - {chat.time}</span>
+          <img
+            src="https://suplike.xyz/img/{chat.image}"
+            alt=""
+            class="avatar"
+          />
+          <div class="message">
+            <h3 class="name">
+              {chat.firstname
+                ? chat.firstname + " " + " " || chat.lastname
+                : chat.username}
+            </h3>
+            <div class="last-message"
+              ><p class="msg ellipsis">{@html chat.msg||"empty chat"}</p><div class="time"
+                > {formatTime(chat.time)}</div
+              >
+            </div>
           </div>
         </div>
       {/each}
@@ -124,26 +93,8 @@
       <p>There are no users found for query: {searchQuery}</p>
     {/if}
   </div>
-  <button on:click={toggleSheet}>Toggle Sheet</button>
 
-  <ModalBottom isOpen={isSheetOpen}>
-    <div class="share-options">
-      <button class="share-option" type="button">
-        <img src="facebook-icon.png" alt="Share on Facebook">
-        <span>Share on Facebook</span>
-      </button>
-      <button class="share-option" type="button">
-        <img src="twitter-icon.png" alt="Share on Twitter">
-        <span>Share on Twitter</span>
-      </button>
-      <button class="share-option" type="button">
-        <i class="fas fa-twitter"></i>
-        <span>Share on Instagram</span>
-      </button> 
-      <!-- add more social media sharing options here -->
-    </div>
-  </ModalBottom>
-  
+  <ModalBottom isOpen={isSheetOpen}>hello</ModalBottom>
 </main>
 
 <style>
@@ -202,7 +153,7 @@
     margin: 0;
     padding: 20px 10px;
     border-radius: 4px;
-    width: (100% - 20px);
+    width: calc(100% - 20px);
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -223,46 +174,30 @@
     font-weight: bold;
     margin-bottom: 5px;
   }
+  .message {
+    width: 100%;
+  }
   .last-message {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: calc(100% - 5vw);
     font-size: 14px;
     color: #9b9b9b;
   }
+  .last-message p.msg {
+    width: 200px;
+  }
+  .ellipsis {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  
-
-  .share-options {
+  .last-message .time {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin: 20px 0;
-  }
-
-  .share-option {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 80px;
-    margin: 0 10px 10px 0;
-    padding: 10px;
-    background-color: #f2f2f2;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease-out;
-  }
-
-  .share-option:hover {
-    background-color: #e6e6e6;
-  }
-
-  .share-option i {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 10px;
-  }
-
-  .share-option span {
-    font-size: 12px;
-    text-align: center;
+    width: 100%;
+    justify-content: end;
   }
 </style>

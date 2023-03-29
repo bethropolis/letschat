@@ -49,13 +49,13 @@
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #333;
+    background-color: var(--color-dark);
     color: var(--color-light);
     padding: 10px;
     border-radius: 5px;
     opacity: 0.8;
     transition: opacity 0.3s ease;
-    z-index: 999;
+    z-index: 99;
   }
 
   .snackbar p {
