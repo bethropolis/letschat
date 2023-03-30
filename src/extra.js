@@ -25,3 +25,24 @@ export function formatTime(timestamp) {
     return `${years} ${years === 1 ? 'year' : 'years'} ago`;
   }
 }
+
+export function convertDateToTime(dateString) {
+  // Create a new Date object from the date string
+  const date = new Date(dateString);
+
+  // Get the hours and minutes from the date object
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  // Determine whether it's AM or PM
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+
+  // Convert the hours to 12-hour format
+  const formattedHours = hours % 12 || 12;
+
+  // Pad the minutes with a leading zero if necessary
+  const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+  // Return the formatted time string
+  return `${formattedHours}:${formattedMinutes} ${ampm}`;
+}

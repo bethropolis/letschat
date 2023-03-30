@@ -16,6 +16,7 @@
   const activePage = "home"
 </script>
 
+
 <main>
   <Header {navOptions} />
   <Posts />

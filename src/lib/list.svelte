@@ -1,4 +1,5 @@
 <script>
+	import Snackbar from './ui/snackbar.svelte';
   import { onMount } from "svelte";
   import ModalBottom from "./ui/modalBottom.svelte";
   import { nav } from "../route";
@@ -7,8 +8,11 @@
 
   export let chats = [];
   export let users = [];
+  let chatwith = null;
+;
   let searchActive = true;
   let searchQuery = "";
+  let msg;
 
   function toggleSearch() {
     searchActive = !searchActive;
@@ -21,17 +25,20 @@
   function clearSearch() {
     searchQuery = "";
   }
-  function letsChat(user) {
-    nav(`/chat/${user}`);
+  async function letsChat(username) {
+    nav(`/chat/${username}`);
   }
   let isSheetOpen = false;
 
   const toggleSheet = () => {
     isSheetOpen = !isSheetOpen;
   };
+  
   onMount(() => {
     if (DB("get", "ChatList")) {
+      if(typeof DB("get", "ChatList") == "object"){ 
       chats = DB("get", "ChatList");
+     }
     }
   });
 
@@ -70,7 +77,7 @@
           }}
         >
           <img
-            src="https://suplike.xyz/img/{chat.image}"
+            src="{chat.image}"
             alt=""
             class="avatar"
           />
@@ -93,7 +100,7 @@
       <p>There are no users found for query: {searchQuery}</p>
     {/if}
   </div>
-
+  <Snackbar {msg}/>
   <ModalBottom isOpen={isSheetOpen}>hello</ModalBottom>
 </main>
 

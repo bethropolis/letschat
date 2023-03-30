@@ -1,6 +1,6 @@
 import { navigate} from "svelte-routing";
 
-export function nav(location, params) {
+export function nav(location = "", params = null) {
  
   // Construct the path to the route using the location and parameters
   const path = location + (params ? "?" + new URLSearchParams(params) : "");

@@ -11,7 +11,6 @@
   import Following from "./lib/following.svelte";
   import Notification from "./lib/notification.svelte";
   import Comment from "./lib/comment.svelte";
-  import List from "./lib/list.svelte";
 </script>
 
 <main>
@@ -23,7 +22,7 @@
     <Route path="/profile/:username" component={Profile} />
     <Route path="/settings" component={Settings} />
     <Route path="/chat" component={Chat} />
-    <Route path="/chat/:username" component={Chat} />
+    <Route path="/chat/:username" component={Chat} let:params />
     <Route path="/post" component={Post} />
     <Route path="/search" component={Search} />
     <Route path="/following" component={Following} />
