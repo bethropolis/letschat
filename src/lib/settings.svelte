@@ -13,110 +13,113 @@
   };
 
   const settingsPage = {
-  header: {
-    avatar: "https://via.placeholder.com/80",
-    title: "Settings",
-    subtitle: "Configure your account settings"
-  },
-  sections: [
-    {
-      title: "Account",
-      items: [
-        {
-          type: "input",
-          label: "Username",
-          value: "johndoe",
-          icon: "fas fa-user",
-          action: {
-            type: "func",
-            name: "updateUsername"
-          }
-        },
-        {
-          type: "input",
-          label: "Email",
-          value: "johndoe@example.com",
-          icon: "fas fa-envelope",
-          action: {
-            type: "func",
-            name: "updateEmail"
-          }
-        },
-        {
-          type: "input",
-          label: "Password",
-          value: "",
-          icon: "fas fa-lock",
-          action: {
-            type: "func",
-            name: "updatePassword"
-          }
-        }
-      ]
+    header: {
+      avatar: "https://via.placeholder.com/80",
+      title: "Settings",
+      subtitle: "Configure your account settings",
     },
-    {
-      title: "Notifications",
-      items: [
-        {
-          type: "checkbox",
-          label: "Email Notifications",
-          value: true,
-          icon: "fas fa-envelope",
-          action: {
-            type: "func",
-            name: "toggleEmailNotifications"
-          }
-        },
-        {
-          type: "checkbox",
-          label: "Push Notifications",
-          value: false,
-          icon: "fas fa-bell",
-          action: {
-            type: "func",
-            name: "togglePushNotifications"
-          }
-        }
-      ]
-    },
-    {
-      title: "Appearance",
-      items: [
-        {
-          type: "select",
-          label: "Theme",
-          value: "light",
-          icon: "fas fa-palette",
-          options: [
-            { label: "Light", value: "light" },
-            { label: "Dark", value: "dark" }
-          ],
-          action: {
-            type: "func",
-            name: "changeTheme"
-          }
-        },
-        {
-          type: "li",
-          label: "Change Avatar",
-          icon: "fas fa-camera",
-          action: {
-            type: "func",
-            name: "changeAvatar"
-          }
-        }
-      ]
-    }
-  ]
-};
+    sections: [
+      {
+        title: "Account",
+        items: [
+          {
+            type: "input",
+            label: "Username",
+            value: "johndoe",
+            icon: "fas fa-user",
+            action: {
+              type: "func",
+              name: "updateUsername",
+            },
+          },
+          {
+            type: "input",
+            label: "Email",
+            value: "johndoe@example.com",
+            icon: "fas fa-envelope",
+            action: {
+              type: "func",
+              name: "updateEmail",
+            },
+          },
+          {
+            type: "input",
+            label: "Password",
+            value: "",
+            icon: "fas fa-lock",
+            action: {
+              type: "func",
+              name: "updatePassword",
+            },
+          },
+        ],
+      },
+      {
+        title: "Notifications",
+        items: [
+          {
+            type: "checkbox",
+            label: "Email Notifications",
+            value: true,
+            icon: "fas fa-envelope",
+            action: {
+              type: "func",
+              name: "toggleEmailNotifications",
+            },
+          },
+          {
+            type: "checkbox",
+            label: "Push Notifications",
+            value: false,
+            icon: "fas fa-bell",
+            action: {
+              type: "func",
+              name: "togglePushNotifications",
+            },
+          },
+        ],
+      },
+      {
+        title: "Appearance",
+        items: [
+          {
+            type: "select",
+            label: "Theme",
+            value: "light",
+            icon: "fas fa-palette",
+            options: [
+              { label: "Light", value: "light" },
+              { label: "Dark", value: "dark" },
+            ],
+            action: {
+              type: "func",
+              name: "changeTheme",
+            },
+          },
+          {
+            type: "li",
+            label: "Logout",
+            style: {
+              color: "red",
+            },
+            icon: "fa fa-arrow-right-from-bracket",
+            action: {
+              type: "func",
+              name: "logOut",
+            },
+          },
+        ],
+      },
+    ],
+  };
 
   function logOut() {
-    DB("remove","token")
-    DB("remove","login")
+    DB("remove", "token");
+    DB("remove", "login");
     msg = "you have successfully logged out";
-    nav('login')
+    nav("login");
   }
-  function codeEval(data){
+  function codeEval(data) {
     if (data == "logOut") return logOut();
   }
 </script>
@@ -177,9 +180,11 @@
               {:else if item.type === "li"}
                 <li
                   class="settings-list-item-li"
-                  on:click={()=>{codeEval(item.action.name)}}
+                  on:click={() => {
+                    codeEval(item.action.name);
+                  }}
                 >
-                  <span>{item.label}</span>
+                  <span style="color: {item.style.color}">{item.label}</span>
                   <i class={item.icon} />
                 </li>
               {:else}
@@ -258,7 +263,7 @@
   }
 
   .settings-list-section-title {
-    font-size: 24px; 
+    font-size: 24px;
     margin-bottom: 10px;
   }
 

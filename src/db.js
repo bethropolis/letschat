@@ -1,5 +1,5 @@
 import Snackbar from "./lib/ui/snackbar.svelte";
-export function DB(type, key, data = "") {
+export function DB(type = "", key = "", data = "") {
   if (type === "get") {
     if (data) {
       const storedData = JSON.parse(localStorage.getItem(key));

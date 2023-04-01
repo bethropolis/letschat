@@ -8,6 +8,7 @@
   import { isCurrentPage } from "../route";
   import {DB} from "../db";
 
+  export let location;
   let user_token = DB('get','token');
   let chatwith;
   let chat_key;

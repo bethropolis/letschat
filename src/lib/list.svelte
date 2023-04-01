@@ -5,6 +5,7 @@
   import { nav } from "../route";
   import { formatTime } from "../extra";
   import { DB } from "../db";
+  import config from "../app.json";
 
   export let chats = [];
   export let users = [];

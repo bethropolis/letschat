@@ -11,6 +11,7 @@
   import Following from "./lib/following.svelte";
   import Notification from "./lib/notification.svelte";
   import Comment from "./lib/comment.svelte";
+  import StoriesBox from "./lib/ui/storiesBox.svelte";
 </script>
 
 <main>
@@ -27,7 +28,7 @@
     <Route path="/search" component={Search} />
     <Route path="/following" component={Following} />
     <Route path="/notification" component={Notification} />
-    <Route path="/comment" component={Comment} />
+    <Route path="/comment/:post" component={Comment} />
   </Router>
 </main>
 

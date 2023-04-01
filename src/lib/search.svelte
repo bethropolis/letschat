@@ -5,22 +5,35 @@
   import UsersSearch from "./users-search.svelte";
   import { nav } from "../route.js";
   import { checkParams } from "../route.js";
+
+  export let location;
+  let params = {};
   let posts;
   let users;
   let search = "";
   let title = "Search";
   const activePage = "search";
   let activetab = "users";
+
   const doSearch = () => {
     if (search == "") return;
     if (activetab == "posts") posts.makeSearch();
     if (activetab == "users") users.makeSearch();
   };
 
-  if (checkParams("q")) {
-    search = checkParams("q");
+
+$: if (params && params.q) {
     activetab = "posts";
-    doSearch();
+    search = params.q;
+    // doSearch();
+  }
+
+
+  $: if (location) {
+    const urlParams = new URLSearchParams(location.search);
+    for (let [key, value] of urlParams.entries()) {
+      params[key] = value;
+    }
   }
 </script>
 

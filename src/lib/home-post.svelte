@@ -13,6 +13,7 @@
   if (!hasMorePosts || isLoading) {
     return;
   }
+
   isLoading = true;
   const lastPostId = posts.length > 0 ? posts[posts.length - 1].id : 0;
   const storedData = JSON.parse(DB("get", "homePost")) || { data: [], timestamp: 0 };

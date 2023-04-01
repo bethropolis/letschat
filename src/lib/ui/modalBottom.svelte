@@ -1,23 +1,23 @@
 <script>
-  export let isOpen = true;
+  export let isOpen = false;
   let startY = 0;
   let startHeight = 0;
   let handle = null;
   let max = false;
+  let isInfo = true;
 
+  export let info = {};
   const toggleSheet = () => {
-    if(handle){
+    if (handle) {
       handle.parentNode.style.height = `fit-content`;
     }
     isOpen = !isOpen;
-
   };
-  const resize  = ()=>{
-    if(!handle)return;
-    if(!max) return;
-       handle.parentNode.style.height = `fit-content`;
- 
-  }
+  const resize = () => {
+    if (!handle) return;
+    if (!max) return;
+    handle.parentNode.style.height = `fit-content`;
+  };
 
   const handleTouchStart = (event) => {
     event.preventDefault();
@@ -28,30 +28,49 @@
   };
 
   const handleTouchMove = (event) => {
-      const deltaY = startY - event.touches[0].clientY;
-      const newHeight = startHeight + deltaY;
-      if (newHeight >= 500) return max=true;
+    const deltaY = startY - event.touches[0].clientY;
+    const newHeight = startHeight + deltaY;
+    if (newHeight >= 500) return (max = true);
+    handle.parentNode.style.height = `${newHeight}px`;
+    requestAnimationFrame(() => {
       handle.parentNode.style.height = `${newHeight}px`;
-      requestAnimationFrame(() => {
-        handle.parentNode.style.height = `${newHeight}px`;
-      });
-    
-  
+    });
   };
 
   const handleTouchEnd = () => {
     document.removeEventListener("touchmove", handleTouchMove);
     document.removeEventListener("touchend", handleTouchEnd);
   };
+  function showInfo(info) {
+    if (info) return false;
+    return;
+  }
+  $: isInfo = showInfo(info);
 </script>
+
 <main>
-<div class="bottom-sheet {isOpen ? 'open' : ''}" on:dblclick={resize}>
-  <div class="bottom-sheet-handle" on:touchstart={handleTouchStart} on:click={toggleSheet} bind:this={handle}></div>
-  <slot />
-</div>
- </main>
+  <div class="bottom-sheet {isOpen ? 'open' : ''}" on:dblclick={resize}>
+    <div class="header">
+      <div
+        class="bottom-sheet-handle"
+        on:click={toggleSheet}
+        on:touchstart={handleTouchStart}
+        bind:this={handle}
+      />
+
+      <div class="dropdown" hidden={isInfo}>
+        <i class="far fa-sharp {info.icon} icon" />
+        <div class="dropdown-content">
+          {info.txt}
+        </div>
+      </div>
+    </div>
+    <slot />
+  </div>
+</main>
+
 <style>
-  main{
+  main {
     height: 100%;
     width: 100%;
     overflow: hidden;
@@ -65,7 +84,7 @@
     background-color: var(--color-post);
     padding: 10px 30px 30px;
     border-radius: 24px 24px 0 0;
-    transition: transform 0.3s ease-out;
+    transition: transform 0.5s ease-out;
     transform: translateY(100%);
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
     font-size: 16px;
@@ -86,5 +105,29 @@
     margin: 10px auto 30px;
     cursor: pointer;
     pointer-events: auto;
+  }
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    padding: 7px 16px;
+    border-radius: 4px;
+    right: 5px;
+    width: 40%;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .icon {
+    position: absolute;
+    top: 16px;
+    right: 1em;
+    font-size: 1.4rem;
+    color: var(--color-icon);
   }
 </style>

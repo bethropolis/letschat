@@ -3,7 +3,7 @@
   export let actions = [];
   export let progress = false;
 
-  let visible = false;
+  export let visible = false;
 
   const showSnackbar = () => {
     visible = true;

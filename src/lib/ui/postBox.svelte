@@ -1,11 +1,11 @@
 <script>
   import { DB } from "../../db";
   import { makeRequest } from "../../api";
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from "svelte";
+  import { nav } from "../../route";
+  import config from "../../app.json";
 
   const dispatch = createEventDispatcher();
-
-  
 
   export let post = {};
   let user_token = DB("get", "token");
@@ -13,10 +13,16 @@
   async function likePost() {
     post.liked = !post.liked;
     post.liked ? post.post_likes++ : post.post_likes--;
-    const data = await makeRequest("like", "POST", {user_token, post_id:post.post_id});
-    dispatch('like');
+    const data = await makeRequest("like", "POST", {
+      user_token,
+      post_id: post.post_id,
+    });
+    dispatch("like");
   }
-  
+
+  function goToComments(){
+    nav(`comment/${post.post_id}`)
+  }
 </script>
 
 <main>
@@ -24,7 +30,7 @@
     <header class="post-header">
       <div class="user-info">
         <img
-          src={`https://suplike.xyz/img/${post.user.profile_picture}`}
+          src={`${config.base_url}/img/${post.user.profile_picture}`}
           alt={post.user.name}
           class="user-avatar"
         />
@@ -44,7 +50,7 @@
     <div class="post-body">
       {#if post.image}
         <img
-          src={`https://suplike.xyz/img/${post.image}`}
+          src={`${config.base_url}/img/${post.image}`}
           alt={post.image_text}
           class="post-image"
         />
@@ -60,13 +66,14 @@
           />{post.post_likes}
         </button>
         <button class="post-action-button">
-          <i class="far fa-comment post-action-icon" /> Comment
+          <i class="far fa-comment post-action-icon" on:click={goToComments} />
+          {post.comment_count || 0}
         </button>
         <button class="post-action-button">
-          <i class="fas fa-retweet post-action-icon" /> Repost
+          <i class="fas fa-retweet post-action-icon" />
         </button>
         <button class="post-action-button">
-          <i class="fas fa-share post-action-icon" /> Share
+          <i class="fas fa-share post-action-icon" />
         </button>
       </div>
     </footer>
@@ -82,6 +89,7 @@
     padding: 20px 10px;
     margin: 10px auto;
     position: relative;
+    max-width: 90%;
   }
 
   .post-header {
@@ -130,27 +138,33 @@
   }
 
   .dropdown ul {
+    margin: 0;
+    padding: 0;
     background-color: var(--color-light);
     border: 1px solid #e2e2e2;
     border-radius: 5px;
     display: none;
     list-style: none;
-    padding: 5px;
     position: absolute;
     right: 0;
-    top: 100%;
+    top: 20px;
+    width: 120px;
     z-index: 1;
   }
 
   .dropdown ul li {
+    position: relative;
     cursor: pointer;
-    padding: 5px;
+    padding: 5px 0;
   }
 
   .dropdown:hover ul {
     display: block;
   }
-
+ .dropdown li:hover {
+    background-color: var(--mauve);
+    color: var(--color-light);
+  }
   .post-body {
     margin: 25px auto;
     overflow: hidden;
@@ -189,6 +203,11 @@
     cursor: pointer;
     font-size: 16px;
   }
+  .post-actions{
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+  }
 
   .post-footer button:hover i {
     color: var(--color-primary);
@@ -199,12 +218,5 @@
   }
   .post-footer .fa-heart {
     color: var(--color-primary);
-  }
-
-  .post-footer p {
-    color: #9b9b9b;
-    font-size: 14px;
-    margin: 0;
-    text-align: right;
   }
 </style>

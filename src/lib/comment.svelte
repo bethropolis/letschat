@@ -1,121 +1,172 @@
 <script>
+  import Snackbar from "./ui/snackbar.svelte";
+  import { makeRequest } from "../api";
+  import { onMount } from "svelte";
   import Header from "./header.svelte";
   import ModalBottom from "./ui/modalBottom.svelte";
-  let comments = [{
-      id: 1,
-      username: "dddd",
-      name: "John Doe",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-      comment: "This is a great post!",
-      date: "2021-08-01",
-      replies: [
-        {
-          id: 1,
-          username: "hugga",
-          name: "Jane Smith",
-          avatar: "https://randomuser.me/api/portraits/women/1.jpg",
-          comment: "I totally agree with you!",
-          date: "2021-08-02",
-        },
-      ],
-    },
-    {
-      id: 2,
-      username: "hugga",
-      name: "Alice Johnson",
-      avatar: "https://randomuser.me/api/portraits/women/2.jpg",
-      comment: "Thanks for sharing!",
-      date: "2021-08-03",
-      replies: [],
-    }
-  ];
+  import { DB } from "../db";
+  import { formatTime } from "../extra";
+
+  let modalComment = false;
+  let disableBtn = false;
+  export let post = "";
+  let user_token = DB("get", "token"); // user
+  let user_username = DB("get", "login", "username");
+  let user_profile = DB("get", "login", "profile_picture");
+  let reply;
+  let replyId = ""; // parent_id
+  let replyTo = "";
+  let comments = [];
+
+  let snack_msg;
+
   let title = "hello";
-  let activePage = "";
-  function addComment(name_, comment_) {
-    const name = name_;
-    const username = "thisguy";
-    const comment = comment_;
-    const date = new Date().toISOString().slice(0, 10);
-    const avatar = `https://randomuser.me/api/portraits/${
-      Math.random() < 0.5 ? "men" : "women"
-    }/${Math.floor(Math.random() * 100)}.jpg`;
 
-    comments = [
-      ...comments,
-      {
-        id: comments.length + 1,
-        username,
-        name,
-        avatar,
-        comment,
-        date,
-        replies: [],
-      },
-    ];
+  let info = {
+    icon: "fa-circle-question",
+    txt: "hey, type your comments and click the add comment button",
+  };
+
+  const getComments = async (user_token, post_id) => {
+    await makeRequest("comment", "GET", { user_token, post_id }).then(
+      (response) => {
+        if (response.data.type == "success") {
+          comments = response.data.data || [];
+        } else {
+          comments = [];
+          modalComment = true;
+        }
+      }
+    );
+  };
+
+  const sendComment = async (comment) => {
+    await makeRequest("comment", "POST", comment);
+    if (Response) {
+      getComments(user_token, post);
+    } else {
+      snack_msg = "failed to send";
+    }
+  };
+
+  onMount(() => {
+    getComments(user_token, post);
+  });
+
+  async function addComment() {
+    disableBtn = true;
+    const username = user_username;
+    const comment = replyTo ? `${replyTo} ${reply}` : reply;
+
+    let params = {
+      post_id: post,
+      comment,
+      user_token,
+      parent_id: replyId || null,
+    };
+    await sendComment(params);
+
+    reply = "";
+    replyTo = null;
+    replyId = null;
+    disableBtn = false;
+    modalComment = false;
   }
 
-  function addReply(commentId, comment_) {
-    const name = "yakob";
-    const username = "him";
-    const comment = comment_;
-    const date = new Date().toISOString().slice(0, 10);
-    const avatar = `https://randomuser.me/api/portraits/${
-      Math.random() < 0.5 ? "men" : "women"
-    }/${Math.floor(Math.random() * 100)}.jpg`;
+  const addReply = (user) => {
+    replyTo = user;
+  };
 
-    const commentIndex = comments.findIndex((c) => c.id === commentId);
-    comments[commentIndex].replies = [
-      ...comments[commentIndex].replies,
-      {
-        id: comments[commentIndex].replies.length + 1,
-        username,
-        name,
-        avatar,
-        comment,
-        date,
-      },
-    ];
-  }
+  // yeah this one is normal toggle and on toggle
+  const toggleModal = (open = false) => {
+    if (open) {
+      if (replyTo) return (replyTo = null) && (replyId = null);
+      return (modalComment = !modalComment);
+    }
+    modalComment = true;
+  };
+
+  const snackMessage = (msg) => {
+    snack_msg = msg;
+
+    setTimeout(() => {
+      snack_msg = null;
+    }, 500);
+  };
 </script>
 
 <main>
-  <Header {title} />
- 
+  <Header {title}>
+    <i
+      class="fa fa-plus"
+      on:click={() => {
+        toggleModal(true);
+      }}
+    />
+  </Header>
 
   {#if comments.length === 0}
-    <p>No comments yet.</p>
+    <div class="alert">
+      <i class="fa fa-comment" />
+      <p>No comments yet. Be the first to comment!</p>
+    </div>
   {:else}
     {#each comments as comment}
       <div class="comment">
-        <img src={comment.avatar} alt={comment.name} />
+        <img src={comment.avatar} alt={comment.username} />
         <div class="comment-body">
-          <h3>{comment.name}</h3>
+          <h3>{comment.username}</h3>
           <p>{comment.comment}</p>
-          <small>{comment.date}</small>
+          <small>{formatTime(comment.date)}</small>
           <div class="actions">
             <button
               on:click={() => {
-                addReply(comment.id, "hello");
+                comment.likes++;
+                comment.liked = !comment.liked;
+              }}><i class="fa fa-thumbs-up" />{comment.likes || 0}</button
+            >
+            <button
+              on:click={() => {
+                replyId = comment.id;
+                addReply(`@${comment.username}`);
+                toggleModal(false);
               }}><i class="fas fa-reply" /> Reply</button
             >
-            <button><i class="fas fa-flag" /> Report</button>
+            <button
+              on:click={() => {
+                snackMessage("reported");
+              }}><i class="fas fa-flag" /> Report</button
+            >
           </div>
           {#if comment.replies.length > 0}
             <div class="replies">
               {#each comment.replies as reply}
                 <div class="reply">
-                  <img src={reply.avatar} alt={reply.name} />
+                  <img src={reply.avatar} alt={reply.username} />
                   <div class="reply-body">
-                    <h4>{reply.name}</h4>
+                    <h4>{reply.username}</h4>
                     <p>{reply.comment}</p>
-                    <small>{reply.date}</small>
+                    <small>{formatTime(reply.date)}</small>
                     <div class="actions">
                       <button
                         on:click={() => {
-                          addReply(comment.id, `@${reply.username} hello`);
+                          reply.likes++;
+                          reply.liked = !reply.liked;
                         }}
-                      ><i class="fas fa-reply" /> Reply</button>
-                        <button><i class="fas fa-flag" /> Report</button>
+                        ><i class="fa fa-thumbs-up" />{reply.likes || 0}</button
+                      >
+                      <button
+                        on:click={() => {
+                          replyId = comment.id;
+                          addReply(`@${reply.username}`);
+                          toggleModal(false);
+                        }}><i class="fas fa-reply" /> Reply</button
+                      >
+                      <button
+                        on:click={() => {
+                          snackMessage("reported");
+                        }}><i class="fas fa-flag" /> Report</button
+                      >
                     </div>
                   </div>
                 </div>
@@ -127,33 +178,32 @@
     {/each}
   {/if}
 
-    
-  <ModalBottom>
+  <ModalBottom bind:isOpen={modalComment} {info}>
     <form on:submit|preventDefault={addComment}>
-      <label for="comment">Comment:</label>
-      <textarea id="comment" required placeholder="enter your coment..." />
-  
-      <button type="submit">Add Comment</button>
+      <label for="comment"
+        >{replyTo ? `replying to: ${replyTo}` : "write comment:"}</label
+      >
+      <textarea
+        id="comment"
+        required
+        placeholder="enter your coment..."
+        bind:value={reply}
+      />
+      <button type="submit" disabled={disableBtn}
+        >{disableBtn ? "sending comment..." : "Add comment"}</button
+      >
     </form>
-    </ModalBottom>
-
+  </ModalBottom>
+  <Snackbar msg={snack_msg} />
 </main>
 
 <style>
-
   main {
     margin: 0 auto;
     max-width: 800px;
     background-color: var(--color-light);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 0.5rem;
-  }
-
-  h1 {
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 2rem;
-    color: var(--color-primary);
   }
 
   form {
@@ -240,8 +290,8 @@
   }
 
   .reply img {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     object-fit: cover;
   }
@@ -280,5 +330,4 @@
   .hidden {
     display: none;
   }
-
 </style>
