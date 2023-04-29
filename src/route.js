@@ -3,10 +3,11 @@ import { navigate} from "svelte-routing";
 export function nav(location = "", params = null) {
  
   // Construct the path to the route using the location and parameters
-  const path = location + (params ? "?" + new URLSearchParams(params) : "");
+  const path = "/"+location + (params ? "?" + new URLSearchParams(params) : "");
+  console.log("🚀 ~ file: route.js:7 ~ nav ~ path:", path)
 
   // Use the navigate function from svelte-routing to navigate to the path
-  navigate(path);
+  navigate(path  );
 }
 
 // redirect to login page if not logged in

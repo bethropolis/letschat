@@ -1,4 +1,5 @@
 <script>
+  import { fade } from 'svelte/transition';
   export let isOpen = false;
   let startY = 0;
   let startHeight = 0;
@@ -49,7 +50,7 @@
 </script>
 
 <main>
-  <div class="bottom-sheet {isOpen ? 'open' : ''}" on:dblclick={resize}>
+  <div class="bottom-sheet {isOpen ? 'open' : ''}" on:dblclick={resize} transition:fade>
     <div class="header">
       <div
         class="bottom-sheet-handle"
@@ -71,6 +72,7 @@
 
 <style>
   main {
+    position: relative;
     height: 100%;
     width: 100%;
     overflow: hidden;

@@ -13,6 +13,7 @@
   const chat_key = DB("get", "login", "chat_key");
   const users_avatar = DB("get", "login", "profile_picture");
   let reciever_avatar = "";
+  const emojiRegex = /[\uD800-\uDFFF]/;
 
   async function updateChatWith() {
     chatwith = (await users.find((user) => user.username === username)) || null;
@@ -39,26 +40,57 @@
         console.log("no messages");
       }
       start = messages[messages.length - 1].id;
-       setTimeout(
-          () => getMessages({ to: data.to, from: data.from, start }),
-          5500
-        );
+      setTimeout(
+        () => getMessages({ to: data.to, from: data.from, start }),
+        5500
+      );
     } catch (error) {
       console.error(error);
       return [];
     }
   }
-  function renderText(text, emojiClass = "emoji") {
-    const emojiRegex = /[\uD800-\uDFFF]/;
-    const chars = Array.from(text);
-    const hasNonEmoji = chars.some((char) => !emojiRegex.test(char));
-    if (hasNonEmoji || chars.length !== 1) {
-      return text;
+
+  function renderText(text) {
+    if (emojiRegex.test(text)) {
+      // Render emoji if there are emoji characters in the text
+      text = renderEmoji(text);
     }
-    const newText = `<span class="${emojiClass}">${text}</span>`;
-    return newText;
+
+    if (text.includes("\n")) {
+      // Add line breaks if there are "\n" characters in the text
+      text = addBreaks(text);
+    }
+
+     // Check for code blocks enclosed in triple backticks
+  const codeRegex = /```([\s\S]*)```/;
+  if (codeRegex.test(text)) {
+    // Replace code blocks with <pre><code> elements
+    text = text.replace(codeRegex, (match, p1) => {
+      return renderCode(p1);
+    });
+  }
+    // Add other checks for additional text formatting functions here
+    return text;
   }
 
+  function renderEmoji(text, emojiClass = "emoji") {
+    // Add an emoji class if the first character of the text is an emoji
+    const firstChar = text.charAt(0);
+    if (emojiRegex.test(firstChar)) {
+      text = `<span class="${emojiClass}">${text}</span>`;
+    }
+    return text;
+  }
+
+  function addBreaks(text, separator = "\n") {
+    // Replace separator with line breaks
+    return text.replace(new RegExp(separator, "g"), "<br>");
+  }
+
+  function renderCode(code) {
+  // Wrap code block in <pre><code> element
+  return `<pre><code>${code.trim()}</code></pre>`;
+}
   updateChatWith();
 
   $: if (key) {
@@ -66,7 +98,7 @@
   }
 
   $: reciever_avatar = chatwith.image;
-  $: key = chatwith.chat_key
+  $: key = chatwith.chat_key;
 </script>
 
 <main>
@@ -147,10 +179,10 @@
     line-height: 1.4;
     background-color: var(--color-accent-dark);
   }
-  .content:has(.image){
+  .content:has(.image) {
     background-color: transparent !important;
   }
-  .image{
+  .image {
     max-width: 100%;
     max-height: 200px;
     object-fit: contain;
@@ -186,6 +218,13 @@
     text-decoration: none;
     color: var(--plum);
   }
+  :global(code){
+    /* wrap text */
+    white-space: pre-wrap;
+    padding: 0.2em 0.4em;
+    font-size: 0.8em;
+
+  }
   .receiver .content {
     color: var(--color-lighter);
     background-color: var(--color-primary);
@@ -200,7 +239,7 @@
     padding: 0;
     text-align: left;
   }
-  
+
   .time {
     display: flex;
     justify-content: flex-end;

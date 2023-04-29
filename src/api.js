@@ -6,20 +6,13 @@ const api_token = config.api_key;
 const version_no = config.version_no;
 
 export async function makeRequest(endpoint, method, data = {}, headers = {}) {
-  const url = new URL(`${BASE_URL}/api/v${version_no}/${endpoint}/`);
-  url.searchParams.append("api_key", api_token);
-  const config = { method };
-  config.headers = headers;
-  if (method === "GET") {
-    for (const [key, value] of Object.entries(data)) {
-      url.searchParams.append(key, value);
-    }
-  } else {
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(data)) {
-      formData.append(key, value);
-    }
-    config.data = formData;
+  const params = new URLSearchParams({ api_key: api_token, ...data });
+  const url = `${BASE_URL}/api/v${version_no}/${endpoint}/?${params.toString()}`;
+  const config = { method, headers };
+  if (method !== "GET") {
+    config.headers["Content-Type"] = "application/x-www-form-urlencoded";
+    config.data = params.toString();
   }
-  return await axios(url.toString(), config);
+  return await axios(url, config);
 }
+

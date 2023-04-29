@@ -6,11 +6,11 @@
   let navOptions = [{
     title: "make post",
     icon: "fas fa-plus",
-    link: "/post"
+    link: "post"
   }, {
     title: "chat",
     icon: "fas fa-comment",
-    link: "/chat"
+    link: "chat"
   }
   ]
   const activePage = "home"

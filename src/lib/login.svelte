@@ -1,8 +1,9 @@
 <script>
-  import { navigate } from "svelte-routing";
+  import { login_token } from "../store.js";
   import swal from "sweetalert";
   import { makeRequest } from "../api.js";
   import { DB } from "../db.js";
+  import { nav } from "../route.js";
   const userData = {
     name: "",
     pass: "",
@@ -10,10 +11,12 @@
   };
   let type = "login";
 
-  function login(userData) {
-    if (DB("get", "login")) {
-      return swal("hey", "You are already loggedin", "info");
+  async function login(userData) {
+    if (DB("get", "login", "username") === userData.name) {
+      let accept = await swal("hey", "You are already loggedin", "info");
+      return nav("home");
     }
+
     const headers = {
       "Content-Type": "text/plain",
     };
@@ -21,12 +24,33 @@
       usermail: userData.name,
       userpass: userData.pass,
     };
+
+    function updateExtAcc(newData) {
+      const oldData = DB("get", "extAcc")?.users || [];
+      let combinedData = oldData.concat(newData);
+
+      if (typeof newData === "object" && !Array.isArray(newData)) {
+        // If newData is an object, we need to check for duplicate usernames
+        const usernames = combinedData.map((user) => user.username);
+        combinedData = combinedData.filter(
+          (user, index) => !usernames.slice(0, index).includes(user.username)
+        );
+      } else {
+        // If newData is an array, we can simply use the spread operator to remove duplicates
+        combinedData = [...new Set(combinedData)];
+      }
+
+      DB("update", "extAcc", JSON.stringify({ users: combinedData }));
+    }
+
     makeRequest("login", "POST", params, headers)
       .then((response) => {
         if (response.data.username) {
           DB("set", "login", response.data);
+          updateExtAcc([response.data]);
           DB("set", "token", response.data.user_token);
-          navigate("/home");
+          $login_token = response.data.user_token;
+          nav("home");
           console.log(DB("get", "login", "user"));
         } else {
           swal("Error", response.data.msg, "error");
@@ -54,7 +78,13 @@
         placeholder="password..."
         id="f_pass"
       />
-      <button type="submit" class="btn" on:click={async () => await login(userData)}> login</button>
+      <button
+        type="submit"
+        class="btn"
+        on:click={async () => await login(userData)}
+      >
+        login</button
+      >
       <br />
       <p>
         Don't have an account <b
@@ -84,7 +114,13 @@
         placeholder="password..."
         id="f_pass"
       />
-      <button type="submit" class="btn" on:click={async () => await login(userData)}> Signup</button>
+      <button
+        type="submit"
+        class="btn"
+        on:click={async () => await login(userData)}
+      >
+        Signup</button
+      >
       <br />
       <p>
         Already have an account? <a on:click={() => (type = "login")}>Login</a>

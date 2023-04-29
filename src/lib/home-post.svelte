@@ -15,22 +15,30 @@
   }
 
   isLoading = true;
-  const lastPostId = posts.length > 0 ? posts[posts.length - 1].id : 0;
-  const storedData = JSON.parse(DB("get", "homePost")) || { data: [], timestamp: 0 };
-  const fifteenMinutes = 5 * 60 * 1000;
-  if (Date.now() - storedData.timestamp > fifteenMinutes) {
-    // Clear stored data if it's older than 15 minutes
-    DB("remove", "homePost");
-    storedData.data = [];
-    storedData.timestamp = 0;
-  }
-  const { data: newData } = await makeRequest("post", "GET", { user_token, last_id: lastPostId });
-  const filteredData = newData.filter((post) => !storedData.data.some((p) => p.id === post.id));
-  const data = { data: [...storedData.data, ...filteredData], timestamp: Date.now() };
-  DB("set", "homePost", JSON.stringify(data));
-  posts = data.data;
-  isLoading = false;
-  hasMorePosts = newData.length > 0;
+const lastPostId = posts.length > 0 ? posts[posts.length - 1].id : 0;
+console.log("🚀 ~ file: home-post.svelte:19 ~ loadMorePosts ~ lastPostId:", lastPostId)
+const storedData = DB("get", "homePost") ? DB("get", "homePost") : { data: [], timestamp: 0 };
+console.log("🚀 ~ file: home-post.svelte:20 ~ loadMorePosts ~ storedData:", storedData)
+const fifteenMinutes = 5 * 20 * 1000;
+if (Date.now() - storedData.timestamp > fifteenMinutes) {
+  // Clear stored data if it's older than 15 minutes
+  DB("remove", "homePost");
+  storedData.data = [];
+  storedData.timestamp = 0;
+}
+let newData = [];
+if (lastPostId || storedData.data.length === 0) {
+  // Make a request only if no stored data and lastPostId is 0
+  const response = await makeRequest("post", "GET", { user_token, last_id: lastPostId });
+  newData = response.data;
+}
+const data = { data: [...storedData.data, ...newData], timestamp: Date.now() };
+DB("update", "homePost", JSON.stringify(data));
+posts = data.data;
+isLoading = false;
+hasMorePosts = newData.length > 0;
+
+
 };
 
   onMount(() => {
@@ -54,9 +62,9 @@
   });
 
   function StoreState() {
-    console.log("hey")
-    const data = { data: [...posts], timestamp: JSON.parse(DB("get", "homePost")).timestamp };
+    const data = { data: [...posts], timestamp: DB("get", "homePost","timestamp")};
     DB("set", "homePost", JSON.stringify(data));
+    console.log("🚀 ~ file: home-post.svelte:70 ~ StoreState ~ data:", data)
   }
 </script>
 <main>

@@ -1,15 +1,25 @@
 <script>
+  import { login_token } from "../store";
   import Footer from "./footer.svelte";
   import Header from "./header.svelte";
   import { makeRequest } from "../api.js";
-  export let username = "my profile";
-  export let page; 
+  import ModalBottom from "./ui/modalBottom.svelte";
+  import { nav } from "../route";
+  import { DB } from "../db";
+  export let username = {
+    title: "my profile",
+    action: function () {
+     isOpen = !isOpen;
+    }
+  };
+  let isOpen = false;
+  export let page;
   const activePage = "profile";
   let profile = {
-    id: "waifu",
+    id: "hey",
     name: " Bethuel kipsang",
     email: "rkiprotich081@gmail.com",
-    picture: "https://suplike.xyz/img/waifu.svg",
+    picture: "http://192.168.9.101/suplike/img/download.jpg",
     token: "2e5a66dc006db0575cfefb37c05a9484a6f8770cdb",
     isFollowing: true,
     followers: 150,
@@ -17,16 +27,35 @@
     posts: 100,
     chat_key: "000f8411c193e8cc",
     gender: "M",
-    bio: "What's popping, am a waifu bot. ",
+    bio: "What's popping, am a bot. ",
     date_joined: "2020-12-16",
   };
- let navOptions = [ 
-  {
-    title: "chat",
-    icon: "fas fa-cog",
-    link: "/settings"
+
+  let navOptions = [
+    {
+      title: "chat",
+      icon: "fas fa-cog",
+      link: "settings",
+    },
+  ];
+
+  const existingAccounts = DB("get","extAcc","users")|| [];
+  console.log("🚀 ~ file: profile.svelte:43 ~ existingAccounts:", existingAccounts)
+
+  function selectAccount(account) {
+    DB("remove","homePost");
+    DB("remove","ChatList");
+    DB("remove","ChatListTime");
+    DB("login", account);
+    DB("token", account.user_token);
+    $login_token = account.user_token;
+    isOpen = false;
   }
-  ]
+
+  function switchAccount() {
+    nav("login");
+  }
+
   function updatePage(newPage) {
     console.log(newPage.detail);
     page = newPage.detail; // update the page prop with the new value
@@ -34,7 +63,7 @@
 </script>
 
 <main>
-  <Header title={username} {navOptions}/>
+  <Header title={username} {navOptions} />
 
   <div class="container">
     <div class="profile-details">
@@ -59,7 +88,9 @@
     </div>
     <div class="actions flex">
       <button
-        on:click={() => {(profile.isFollowing = !profile.isFollowing)}} 
+        on:click={() => {
+          profile.isFollowing = !profile.isFollowing;
+        }}
         class={profile.isFollowing ? "unfollow" : "follow"}
       >
         <i class="fa fa-plus" />
@@ -72,6 +103,24 @@
     </div>
   </div>
 
+
+
+  <ModalBottom {isOpen}>
+    <div class="modal-content">
+      <h2>login with existing account</h2>
+      <ul>
+        {#if existingAccounts}
+        {#each existingAccounts as account}
+          <li on:click={() => selectAccount(account)}>
+            <img src={account.profile_picture} alt={account.full_name} />
+            <span>{account.full_name}</span>
+          </li>
+        {/each}
+        {/if}
+      </ul>
+      <button class="btn" on:click={switchAccount}>login to account</button>
+    </div>
+  </ModalBottom>
   <Footer {activePage} on:updatePage={updatePage} />
 </main>
 
@@ -106,7 +155,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;;
+    align-items: flex-start;
   }
 
   .profile-details h2 {
@@ -173,7 +222,7 @@
 
   .follow,
   .unfollow,
-  .chat {
+  .chat ,.btn{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -205,5 +254,60 @@
 
   .fa {
     margin-right: 10px;
+  }
+  .modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 12px;
+  }
+
+  .modal-content h2 {
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .modal-content ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .modal-content li {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: #f2f2f2;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .modal-content li:hover {
+    background-color: #e0e0e0;
+  }
+
+  .modal-content li img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 16px;
+  }
+
+  .modal-content li span {
+    font-weight: bold;
+    flex-grow: 1;
+    margin-right: 16px;
   }
 </style>

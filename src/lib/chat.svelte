@@ -1,36 +1,42 @@
 <script>
-  import {onMount } from "svelte";
+  import { onMount } from "svelte";
   import Header from "./header.svelte";
   import Chatinput from "./ui/chatinput.svelte";
   import Chatbox from "./ui/chatbox.svelte";
   import List from "./list.svelte";
   import { makeRequest } from "../api";
   import { isCurrentPage } from "../route";
-  import {DB} from "../db";
+  import { DB } from "../db";
 
   export let location;
-  let user_token = DB('get','token');
+  let user_token = DB("get", "token");
   let chatwith;
   let chat_key;
-  let users ;
+  let users;
   export let username = "chat";
-  onMount(async ()=>{
+  async function fetchChatList(user_token) {
+    const { data } = await makeRequest("follow", "GET", { user_token });
+    DB("set", "ChatList", data);
+    DB("set", "ChatListTime", Date());
+    return data;
+  }
+
+  function getStoredChatList() {
+    return DB("get", "ChatList");
+  }
+
+  onMount(async () => {
     const storedTime = DB("get", "ChatListTime");
-    const currentTime = new Date().getTime();   
-    
-
-    if (!storedTime || currentTime - new Date(storedTime).getTime() > (5*60*1000)) {
-      const { data } = await makeRequest('follow','GET',{user_token});
-      DB("set", "ChatList", data);
-      DB("set", "ChatListTime", Date());
-      users = data;
+    const currentTime = new Date().getTime();
+    if (
+      !storedTime ||
+      currentTime - new Date(storedTime).getTime() > 5 * 60 * 1000
+    ) {
+      users = await fetchChatList(user_token);
     } else {
-      users = DB("get","ChatList")
+      users = getStoredChatList();
     }
-  })
-  
-
-
+  });
 </script>
 
 <main>
@@ -38,8 +44,8 @@
   {#if isCurrentPage("chat")}
     <List bind:chats={users} />
   {:else}
-    <Chatbox {username}/>
-    <Chatinput {username}/>
+    <Chatbox {username} />
+    <Chatinput {username} />
   {/if}
 </main>
 

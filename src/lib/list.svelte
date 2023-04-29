@@ -27,7 +27,7 @@
     searchQuery = "";
   }
   async function letsChat(username) {
-    nav(`/chat/${username}`);
+    nav(`chat/${username}`);
   }
   let isSheetOpen = false;
 

@@ -1,27 +1,50 @@
 <script>
-  import { DB } from "../../db";
+  import { login_token } from "../../store";
   import { makeRequest } from "../../api";
   import { createEventDispatcher } from "svelte";
   import { nav } from "../../route";
   import config from "../../app.json";
+  import Snackbar from "./snackbar.svelte";
 
   const dispatch = createEventDispatcher();
+  console.log("🚀 ~ file: postBox.svelte:9 ~ dispatch:", $login_token);
 
   export let post = {};
-  let user_token = DB("get", "token");
-
+  let user_token = $login_token;
   async function likePost() {
-    post.liked = !post.liked;
-    post.liked ? post.post_likes++ : post.post_likes--;
-    const data = await makeRequest("like", "POST", {
+    await makeRequest("like", "POST", {
+      user_token,
+      post_id: post.post_id,
+    }).then((response) => {
+      if (response.data.type === "success") {
+        post.liked = !post.liked;
+        post.liked ? post.post_likes++ : post.post_likes--;
+      }
+      dispatch("like");
+    });
+  }
+
+  async function repostPost() {
+    post.reposted = !post.reposted;
+    const { data } = await makeRequest("repost", "POST", {
       user_token,
       post_id: post.post_id,
     });
-    dispatch("like");
+    console.log("🚀 ~ file: postBox.svelte:30 ~ repostPost ~ data:", data);
+    let snackbar = new Snackbar({
+      target: document.body,
+      props: {
+        msg: data.msg,
+        visible: true,
+      },
+    });
   }
 
-  function goToComments(){
-    nav(`comment/${post.post_id}`)
+  function goToComments() {
+    nav(`comment/${post.post_id}`);
+  }
+  function goToProfile() {
+    nav(`profile/${post.user.name}`);
   }
 </script>
 
@@ -33,6 +56,7 @@
           src={`${config.base_url}/img/${post.user.profile_picture}`}
           alt={post.user.name}
           class="user-avatar"
+          on:click={goToProfile}
         />
         <div class="user-name-date">
           <h3 class="user-name">{post.user.name}</h3>
@@ -69,7 +93,7 @@
           <i class="far fa-comment post-action-icon" on:click={goToComments} />
           {post.comment_count || 0}
         </button>
-        <button class="post-action-button">
+        <button class="post-action-button" on:click={repostPost}>
           <i class="fas fa-retweet post-action-icon" />
         </button>
         <button class="post-action-button">
@@ -161,7 +185,7 @@
   .dropdown:hover ul {
     display: block;
   }
- .dropdown li:hover {
+  .dropdown li:hover {
     background-color: var(--mauve);
     color: var(--color-light);
   }
@@ -203,7 +227,7 @@
     cursor: pointer;
     font-size: 16px;
   }
-  .post-actions{
+  .post-actions {
     width: 100%;
     display: flex;
     justify-content: space-around;

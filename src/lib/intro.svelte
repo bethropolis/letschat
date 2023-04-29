@@ -5,11 +5,11 @@
   import { DB } from "../db";
 
   function handleActionClick() {
-    nav("/login");
+    nav("login");
   }
   onMount(() => {
     if (DB("get", "login")) {
-      nav("/home");
+      nav("home");
     }
   });
 </script>

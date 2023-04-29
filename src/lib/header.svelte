@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { nav, isCurrentPage } from "../route.js";
   export let navOptions = [];
-  export let title = "";
+  export let title = "" || null;
   export let backTo = "";
   export let locked = false;
   let backButtonVisible = false;
@@ -21,6 +21,7 @@
     }
   }
 
+
   onMount(() => {
     // check if the current route is not the home page
     // if not, show the back button
@@ -37,7 +38,14 @@
     </button>
   {/if}
 
+  {#if typeof title === "object" && title?.title === "my profile"}
+    <h1 class="header-title" on:click={eval(title?.action)}>
+      {@html title?.title}
+      <span class="fa fa-chevron-down" />
+    </h1>
+{:else}
   <h1 class="header-title">{@html title}</h1>
+{/if}
 
   <div class="header-icon">
     {#if navOptions.length > 0}
@@ -108,6 +116,7 @@
     position: relative;
     display: inline-block;
   }
+
 
   .dropdown-content {
     display: none;

@@ -12,7 +12,7 @@
     {
       title: "home",
       icon: "fas fa-home",
-      link: "/"
+      link: "home"
     }
   ]
   const handleTabClick = (tab) => {
