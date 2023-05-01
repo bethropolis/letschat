@@ -4,12 +4,14 @@
   import PostsSearch from "./posts-search.svelte";
   import UsersSearch from "./users-search.svelte";
   import { nav } from "../route.js";
-  import { checkParams } from "../route.js";
+  import { onMount } from "svelte";
+  import TagsSearch from "./tags-search.svelte";
 
   export let location;
   let params = {};
   let posts;
   let users;
+  let tags;
   let search = "";
   let title = "Search";
   const activePage = "search";
@@ -19,15 +21,18 @@
     if (search == "") return;
     if (activetab == "posts") posts.makeSearch();
     if (activetab == "users") users.makeSearch();
+    if (activetab == "tags") tags.makeSearch();
   };
 
+  onMount(() => {
+    if (activetab == "users") users.makeSearch();
+  });
 
-$: if (params && params.q) {
+  $: if (params && params.q) {
     activetab = "posts";
     search = params.q;
     // doSearch();
   }
-
 
   $: if (location) {
     const urlParams = new URLSearchParams(location.search);
@@ -66,6 +71,14 @@ $: if (params && params.q) {
       >
         Posts</span
       >
+      <!-- tags -->
+      <span
+        on:click={() => {
+          activetab = "tags";
+          nav("search?tags");
+        }}
+        class:selected={activetab == "tags"}>Tags</span
+      >
     </div>
     {#if activetab == "users"}
       <UsersSearch
@@ -79,6 +92,8 @@ $: if (params && params.q) {
         bind:type={activetab}
         bind:query={search}
       />
+    {:else if activetab == "tags"}
+    <TagsSearch bind:this={tags} bind:type={activetab} bind:query={search} />
     {:else}
       <div class="alert">
         <!-- a big icon to tell user should search something -->

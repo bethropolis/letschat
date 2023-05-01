@@ -14,18 +14,16 @@
   const users_avatar = DB("get", "login", "profile_picture");
   let reciever_avatar = "";
   const emojiRegex = /[\uD800-\uDFFF]/;
-
+  let y;
   async function updateChatWith() {
-    chatwith = (await users.find((user) => user.username === username)) || null;
+    chatwith = (await users.find((user) => user.username === username)) || {};
+    console.log("🚀 ~ file: chatbox.svelte:20 ~ updateChatWith ~ chatwith:", chatwith)
   }
 
   async function getMessages(data) {
-    console.log("chat_key:", data.from);
-    console.log("other_chat_key:", data.to);
     try {
       const response = await makeRequest("chat", "GET", data);
       const chats = await response.data;
-      console.log("chats: ", chats);
       if (chats.type == "success") {
         const newMessages = chats.data.map((chat) => ({
           sender: chat.from,
@@ -34,10 +32,7 @@
           type: chat.type,
           id: chat.id,
         }));
-        console.log("newMessages: ", newMessages);
         messages = [...messages, ...newMessages];
-      } else {
-        console.log("no messages");
       }
       start = messages[messages.length - 1].id;
       setTimeout(
@@ -61,22 +56,21 @@
       text = addBreaks(text);
     }
 
-     // Check for code blocks enclosed in triple backticks
-  const codeRegex = /```([\s\S]*)```/;
-  if (codeRegex.test(text)) {
-    // Replace code blocks with <pre><code> elements
-    text = text.replace(codeRegex, (match, p1) => {
-      return renderCode(p1);
-    });
-  }
+    // Check for code blocks enclosed in triple backticks
+    const codeRegex = /```([\s\S]*)```/;
+    if (codeRegex.test(text)) {
+      // Replace code blocks with <pre><code> elements
+      text = text.replace(codeRegex, (match, p1) => {
+        return renderCode(p1);
+      });
+    }
     // Add other checks for additional text formatting functions here
     return text;
   }
 
   function renderEmoji(text, emojiClass = "emoji") {
     // Add an emoji class if the first character of the text is an emoji
-    const firstChar = text.charAt(0);
-    if (emojiRegex.test(firstChar)) {
+    if (emojiRegex.test(text) && text.length === 2) {
       text = `<span class="${emojiClass}">${text}</span>`;
     }
     return text;
@@ -88,24 +82,30 @@
   }
 
   function renderCode(code) {
-  // Wrap code block in <pre><code> element
-  return `<pre><code>${code.trim()}</code></pre>`;
-}
+    // Wrap code block in <pre><code> element
+    return `<pre><code>${code.trim()}</code></pre>`;
+  }
   updateChatWith();
 
   $: if (key) {
     getMessages({ to: chatwith.chat_key, from: chat_key, start: 1 });
   }
+  $: if(messages){
+       setTimeout(() => {
+      y = document.body.scrollHeight;
+    }, 300);
+  }
 
   $: reciever_avatar = chatwith.image;
-  $: key = chatwith.chat_key;
+  $: key = chatwith?.chat_key || "";
 </script>
 
+<svelte:window bind:scrollY={y} />
 <main>
   <div class="chat-box">
     {#each messages as message}
       <div
-        class="chat-bubble {message.sender == chat_key ? 'sender' : 'receiver'}"
+        class="chat-bubble {message.sender == chat_key ? 'sender' : 'receiver'} {message.type}"
       >
         <div class="message">
           {#if message.sender !== chat_key}
@@ -139,6 +139,8 @@
 
   .chat-box {
     width: 100%;
+    margin-bottom: 20px;
+    height: auto;
   }
 
   .chat-bubble {
@@ -218,12 +220,11 @@
     text-decoration: none;
     color: var(--plum);
   }
-  :global(code){
+  :global(code) {
     /* wrap text */
     white-space: pre-wrap;
     padding: 0.2em 0.4em;
     font-size: 0.8em;
-
   }
   .receiver .content {
     color: var(--color-lighter);

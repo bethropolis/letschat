@@ -1,5 +1,6 @@
 <script>
   import { login_token } from "../store";
+  import PostBox from "./ui/postBox.svelte";
   import Footer from "./footer.svelte";
   import Header from "./header.svelte";
   import { makeRequest } from "../api.js";
@@ -8,29 +9,16 @@
   import { DB } from "../db";
   export let username = {
     title: "my profile",
+    username: DB("get", "login", "username"),
     action: function () {
-     isOpen = !isOpen;
-    }
+      isOpen = !isOpen;
+    },
   };
   let isOpen = false;
   export let page;
   const activePage = "profile";
-  let profile = {
-    id: "hey",
-    name: " Bethuel kipsang",
-    email: "rkiprotich081@gmail.com",
-    picture: "http://192.168.9.101/suplike/img/download.jpg",
-    token: "2e5a66dc006db0575cfefb37c05a9484a6f8770cdb",
-    isFollowing: true,
-    followers: 150,
-    following: 100,
-    posts: 100,
-    chat_key: "000f8411c193e8cc",
-    gender: "M",
-    bio: "What's popping, am a bot. ",
-    date_joined: "2020-12-16",
-  };
-
+  let profile = {};
+  let is_switching = false;
   let navOptions = [
     {
       title: "chat",
@@ -38,28 +26,63 @@
       link: "settings",
     },
   ];
+  
+  async function getProfile(user) {
+    let name = typeof username == "object" ? username.username : username;
+    name = user ? user : name;
 
-  const existingAccounts = DB("get","extAcc","users")|| [];
-  console.log("🚀 ~ file: profile.svelte:43 ~ existingAccounts:", existingAccounts)
+    await makeRequest("profile", "GET", {
+      user_token: $login_token,
+      username: name,
+    })
+      .then((res) => {
+        profile = res.data;
+        console.log(
+          "🚀 ~ file: profile.svelte:50 ~ getProfile ~ profile:",
+          profile
+        );
+      })
+      .catch((err) => {
+        console.log("🚀 ~ file: profile.svelte:51 ~ getProfile ~ err:", err);
+      });
+  }
 
-  function selectAccount(account) {
-    DB("remove","homePost");
-    DB("remove","ChatList");
-    DB("remove","ChatListTime");
-    DB("login", account);
-    DB("token", account.user_token);
+  const existingAccounts = DB("get", "extAcc", "users") || [];
+
+  async function selectAccount(account) {
+    is_switching = true;
+    let ext_acc = DB("get", "extAcc");
+    DB('clear');
+    DB("set","extAcc",ext_acc);
+    await DB("set", "login", account);
+    await DB("set", "token", account.user_token);
     $login_token = account.user_token;
-    isOpen = false;
+    await getProfile(account.username);
+    await setTimeout(() => {
+      isOpen = false;
+    }, 1000);
+    await setTimeout(() => {
+      is_switching = false;
+    },1000);
   }
 
   function switchAccount() {
     nav("login");
+  }
+  async function followUser() {
+    await makeRequest("follow", "POST", {
+      user_token: $login_token,
+      following: username ?? username.username,
+    });
+    profile.isFollowing = !profile.isFollowing;
   }
 
   function updatePage(newPage) {
     console.log(newPage.detail);
     page = newPage.detail; // update the page prop with the new value
   }
+
+  $: username && getProfile();
 </script>
 
 <main>
@@ -69,16 +92,16 @@
     <div class="profile-details">
       <img src={profile.picture} alt="Profile picture" />
       <div class="user-name">
-        <h2>{profile.name}</h2>
-        <h3>@{profile.id}</h3>
+        <h2>{profile.name === " " ? profile.username : profile.name}</h2>
+        <h3>@{profile.username}</h3>
         <p class="muted">joined: {profile.date_joined}</p>
       </div>
     </div>
     <div class="info">
-      <div class="bio"><p>{profile.bio}</p></div>
+      <div class="bio"><p>{profile.bio || "im using suplike"}</p></div>
     </div>
     <div class="numbers">
-      <span class="posts" title="Posts">{profile.posts} posts</span>
+      <span class="posts" title="Posts">{profile.posts?.length} posts</span>
       <span class="followers" title="Followers"
         >{profile.followers} followers</span
       >
@@ -88,38 +111,54 @@
     </div>
     <div class="actions flex">
       <button
-        on:click={() => {
-          profile.isFollowing = !profile.isFollowing;
-        }}
+        on:click={followUser}
         class={profile.isFollowing ? "unfollow" : "follow"}
       >
         <i class="fa fa-plus" />
         {profile.isFollowing ? "Unfollow" : "Follow"}
       </button>
-      <button class="chat">
+
+      <button
+        class="chat"
+        on:click={() => {
+          nav(`chat/${profile.username}`);
+        }}
+      >
         <i class="fa fa-comment" />
         Chat
       </button>
     </div>
   </div>
-
-
-
-  <ModalBottom {isOpen}>
-    <div class="modal-content">
-      <h2>login with existing account</h2>
-      <ul>
-        {#if existingAccounts}
-        {#each existingAccounts as account}
-          <li on:click={() => selectAccount(account)}>
-            <img src={account.profile_picture} alt={account.full_name} />
-            <span>{account.full_name}</span>
-          </li>
-        {/each}
-        {/if}
-      </ul>
-      <button class="btn" on:click={switchAccount}>login to account</button>
-    </div>
+  <div class="posts">
+  {#if profile && profile.posts?.length > 0}
+    {#each profile.posts as post}
+      <PostBox {post} />
+    {/each}
+  {/if}
+</div>
+  <ModalBottom bind:isOpen>
+    {#if !is_switching && isOpen}
+      <div class="modal-content">
+        <h2>login with existing account</h2>
+        <ul>
+          {#if existingAccounts}
+            {#each existingAccounts as account}
+              <li on:click={() => selectAccount(account)}>
+                <img src={account.profile_picture} alt={account.full_name} />
+                <span>{account.full_name}</span>
+              </li>
+            {/each}
+          {/if}
+        </ul>
+        <button class="btn" on:click={switchAccount}>login to account</button>
+      </div>
+    {:else}
+      <!-- a loader is shown, switching accounts -->
+      <div class="loader">
+        <i class="fa fa-spinner fa-spin" />
+        <span> switching accounts...</span>
+      </div>
+    {/if}
   </ModalBottom>
   <Footer {activePage} on:updatePage={updatePage} />
 </main>
@@ -131,6 +170,7 @@
     align-items: center;
     font-family: "Roboto", sans-serif;
     padding: 20px;
+    margin-bottom: 4em;
   }
 
   .profile-details {
@@ -222,7 +262,8 @@
 
   .follow,
   .unfollow,
-  .chat ,.btn{
+  .chat,
+  .btn {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -255,6 +296,13 @@
   .fa {
     margin-right: 10px;
   }
+
+  .posts{
+    margin-bottom: 4.5em;
+  }
+
+
+
   .modal-content {
     position: relative;
     display: flex;
@@ -309,5 +357,11 @@
     font-weight: bold;
     flex-grow: 1;
     margin-right: 16px;
+  }
+  .loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font: 16px sans-serif;
   }
 </style>

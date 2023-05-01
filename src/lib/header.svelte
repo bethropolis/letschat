@@ -29,6 +29,9 @@
       backButtonVisible = true;
     }
   });
+
+
+$: console.log("🚀 ~ file: header.svelte:34 ~ title:", title)
 </script>
 
 <main class:locked>
@@ -38,7 +41,7 @@
     </button>
   {/if}
 
-  {#if typeof title === "object" && title?.title === "my profile"}
+  {#if typeof title == "object" && title?.title == "my profile"}
     <h1 class="header-title" on:click={eval(title?.action)}>
       {@html title?.title}
       <span class="fa fa-chevron-down" />

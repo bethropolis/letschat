@@ -63,7 +63,7 @@ hasMorePosts = newData.length > 0;
 
   function StoreState() {
     const data = { data: [...posts], timestamp: DB("get", "homePost","timestamp")};
-    DB("set", "homePost", JSON.stringify(data));
+    DB("update", "homePost", JSON.stringify(data));
     console.log("🚀 ~ file: home-post.svelte:70 ~ StoreState ~ data:", data)
   }
 </script>

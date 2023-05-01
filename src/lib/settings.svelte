@@ -5,11 +5,11 @@
   import Snack from "./ui/snackbar.svelte";
 
   const title = "settings";
-  let msg = "hey";
+  let msg = "";
   let user = {
-    name: "John Doe",
-    email: "johndoe@example.com",
-    avatar: "https://via.placeholder.com/150",
+    name: DB("get", "login", "username"),
+    fname: DB("get", "login", "full_name"),
+    avatar: DB("get", "login", "profile_picture"),
   };
 
   const settingsPage = {
@@ -130,10 +130,14 @@
   <Header {title} />
   <header class="settings-header">
     <div class="settings-header-avatar">
-      <img src={user.avatar} alt="User Avatar" />
+      <input type="file" id="avatar" hidden />
+      <label for="avatar"><img src={user.avatar} alt="User Avatar" /></label>
+      <div class="change-img" >
+        <i class="fas fa-camera"/>
+      </div>
     </div>
     <h1 class="settings-header-title">{user.name}</h1>
-    <p class="settings-header-subtitle">{user.email}</p>
+    <p class="settings-header-subtitle">{user.fname || ""}</p>
   </header>
   <ul class="settings-list">
     {#each settingsPage.sections as section}
@@ -154,7 +158,7 @@
               {:else if item.type === "select"}
                 <label class="settings-list-item-label">
                   <span>{item.label}</span>
-                  <select class="settings-list-item-select" value={item.value}>
+                  <select class="settings-list-item-select" bind:value={item.value}>
                     {#each item.options as option}
                       <option value={option.value}>{option.label}</option>
                     {/each}
@@ -174,7 +178,7 @@
                   <span>{item.label}</span>
                   <textarea
                     class="settings-list-item-textarea"
-                    value={String(item.value)}
+                   value={String(item.value)}
                   />
                 </label>
               {:else if item.type === "li"}
@@ -192,8 +196,8 @@
                   <span>{item.label}</span>
                   <input
                     class="settings-list-item-input"
-                    type={item.type}
-                    value={item.value}
+                    type="input"
+                    bind:value={item.value}
                   />
                 </label>
               {/if}
@@ -224,11 +228,12 @@
   }
 
   .settings-header-avatar {
-    width: 80px;
-    height: 80px;
+    position: relative;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    overflow: hidden;
     margin-bottom: 10px;
+    overflow: hidden;
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
   }
 
@@ -236,6 +241,16 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  .settings-header-avatar .change-img {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50%;
+    bottom: 0;
+    background-color: var(--color-gray);
   }
 
   .settings-header-title {

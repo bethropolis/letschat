@@ -1,15 +1,17 @@
 <script>
-  export let msg;
+  export let msg = "";
   export let actions = [];
   export let progress = false;
 
   export let visible = false;
 
-  const showSnackbar = () => {
+  export const showSnackbar = async (data) => {
+    data ? msg = data : null;
     visible = true;
     if (!progress) {
-      setTimeout(() => {
+      await setTimeout(() => {
         visible = false;
+        msg = "";
       }, 2000);
     }
   };
@@ -19,7 +21,8 @@
     visible = false;
   };
 
-  $: if (msg) showSnackbar();
+
+  $: if (msg !== "") showSnackbar();
 </script>
 
 {#if visible}

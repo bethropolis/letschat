@@ -1,4 +1,6 @@
 <script>
+// @ts-nocheck
+
   import { Router, Route } from "svelte-routing";
   import Intro from "./lib/intro.svelte";
   import Login from "./lib/login.svelte";
@@ -48,7 +50,7 @@
     --color-gray: #ccc;
     --color-post: #ffffffff;
     --color-light: #fff;
-    --color-lighgter: #f8f8f8;
+    --color-line: #0f0f0f10;
     --color-input: #f8f8f8;
     --color-text: #333;
     --color-text-light: #666;
@@ -73,7 +75,7 @@
     --spacing-large: 3rem;
     --font: "Roboto", sans-serif;
   }
-  
+
   :global(body, main) {
     background-color: var(--color-light);
     color: var(--color-dark);
@@ -87,4 +89,5 @@
   :global(*) {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   }
+  
 </style>

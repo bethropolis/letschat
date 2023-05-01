@@ -50,4 +50,7 @@
 </main>
 
 <style>
+  main {
+    height: 100%;
+  }
 </style>

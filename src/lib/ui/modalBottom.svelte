@@ -1,5 +1,5 @@
 <script>
-  import { fade } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
   export let isOpen = false;
   let startY = 0;
   let startHeight = 0;
@@ -47,27 +47,36 @@
     return;
   }
   $: isInfo = showInfo(info);
+
+  $: if (isOpen == true) {
+    // disable scroll when modal is open
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
 </script>
 
 <main>
-  <div class="bottom-sheet {isOpen ? 'open' : ''}" on:dblclick={resize} transition:fade>
-    <div class="header">
-      <div
-        class="bottom-sheet-handle"
-        on:click={toggleSheet}
-        on:touchstart={handleTouchStart}
-        bind:this={handle}
-      />
+  {#if isOpen}
+    <div class="bottom-sheet open" on:dblclick={resize} transition:fly={{ y: 200, duration: 500 }}>
+      <div class="header">
+        <div
+          class="bottom-sheet-handle"
+          on:click={toggleSheet}
+          on:touchstart={handleTouchStart}
+          bind:this={handle}
+        />
 
-      <div class="dropdown" hidden={isInfo}>
-        <i class="far fa-sharp {info.icon} icon" />
-        <div class="dropdown-content">
-          {info.txt}
+        <div class="dropdown" hidden={isInfo}>
+          <i class="far fa-sharp {info.icon} icon" />
+          <div class="dropdown-content">
+            {info.txt}
+          </div>
         </div>
       </div>
+      <slot />
     </div>
-    <slot />
-  </div>
+  {/if}
 </main>
 
 <style>

@@ -1,14 +1,25 @@
 <script>
+  import { login_token } from "../store.js";
   import { makeRequest } from "../api.js";
   import { nav } from "../route.js";
   import APP from "../app.json";
-  let user_token = "16c78b8e0c126b30749f8d93ad9de7479f7decb572";
+  import { DB } from "../db.js";
+  import Snackbar from "./ui/snackbar.svelte";
+  import Following from "./following.svelte";
+  import { onMount } from "svelte";
+  let user_token = $login_token;
   let users = [];
   export let query;
   export let type;
+  let msg;
+  let snackbar;
+  export async function makeSearch(pass=false) {
+    if (!query) {
+      if (DB("get", "popular")) {
+        return (users = DB("get", "popular"));
+      }
+    }
 
-
-  export async function makeSearch() {
     const { data } = await makeRequest("search", "GET", {
       user_token,
       query,
@@ -16,6 +27,7 @@
     });
     console.log(data);
     users = data.data;
+    !query && DB("set", "popular", data.data);
   }
 
   let selectedUser = null;
@@ -27,6 +39,28 @@
   function loadProfile(user) {
     nav(`profile/${user.uidusers}`);
   }
+
+  async function newFollow(user) {
+    console.log("🚀 ~ file: users-search.svelte:43 ~ newFollow ~ user:", user)
+    await makeRequest("follow", "POST", {
+      user_token: $login_token,
+      following: user.uidusers,
+    }).then((data) => {
+      snackbar?.showSnackbar(data.data.msg);
+      console.log("🚀 ~ file: users-search.svelte:48 ~ newFollow ~ user:", user,msg)
+      if(data.data.type == "success"){
+        data.data.msg == "Followed" ? user.following = true : user.following = false;
+        DB("set", "popular", users);
+        makeSearch();
+      console.log("🚀 ~ file: users-search.svelte:48 ~ newFollow ~ user:", user)
+      }
+    });
+  }
+
+ 
+  onMount(()=>{
+    users = DB("get", "popular");
+  })
 </script>
 
 <main>
@@ -51,15 +85,17 @@
           </div>
           <div class="actions">
             <button
-              class:active
-              on:click={(elem) => {
-                const i = elem.currentTarget.querySelector("i");
+              class={user.following ? "active" : ""}
+              on:click={async (elem) => {
+                await newFollow(user);
                 active = !active;
-                i.classList.toggle("fa-plus");
-                i.classList.toggle("fa-check");
               }}
             >
+              {#if user.following}
+              <i class="fa fa-check" />
+              {:else}
               <i class="fa fa-plus" />
+              {/if}
             </button>
           </div>
         </div>
@@ -71,6 +107,7 @@
       <span>No users found</span>
     </div>
   {/if}
+  <Snackbar bind:msg bind:this={snackbar}/>
 </main>
 
 <style>
@@ -80,6 +117,7 @@
     align-items: center;
     height: 100%;
     width: 100%;
+    margin-bottom: 4em;
   }
   .user-list {
     display: flex;
@@ -161,7 +199,11 @@
     transition: all 0.5s ease;
   }
   .user .actions button:hover {
+    /* disable */
     color: var(--color-primary);
+  }
+  .user .actions button.active {
+    color: var(--color-accent);
   }
 
   .active {

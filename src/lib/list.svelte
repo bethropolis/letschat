@@ -1,5 +1,5 @@
 <script>
-	import Snackbar from './ui/snackbar.svelte';
+  import Snackbar from "./ui/snackbar.svelte";
   import { onMount } from "svelte";
   import ModalBottom from "./ui/modalBottom.svelte";
   import { nav } from "../route";
@@ -10,7 +10,6 @@
   export let chats = [];
   export let users = [];
   let chatwith = null;
-;
   let searchActive = true;
   let searchQuery = "";
   let msg;
@@ -34,14 +33,20 @@
   const toggleSheet = () => {
     isSheetOpen = !isSheetOpen;
   };
-  
+
   onMount(() => {
     if (DB("get", "ChatList")) {
-      if(typeof DB("get", "ChatList") == "object"){ 
-      chats = DB("get", "ChatList");
-     }
-    }
+      if (typeof DB("get", "ChatList") == "object") {
+        chats = DB("get", "ChatList");
+      }
+    }else if(DB("get", "ChatListTime")){
+      // chatlist has been deleted
+      DB("remove", "ChatListTime");
+    };
+
   });
+
+
 
   $: users = chats.filter((chat) =>
     chat.username.toLowerCase().includes(searchQuery.toLowerCase())
@@ -77,31 +82,34 @@
             letsChat(chat.username);
           }}
         >
-          <img
-            src="{chat.image}"
-            alt=""
-            class="avatar"
-          />
+          <img src={chat.image} alt="" class="avatar" />
           <div class="message">
             <h3 class="name">
               {chat.firstname
                 ? chat.firstname + " " + " " || chat.lastname
                 : chat.username}
             </h3>
-            <div class="last-message"
-              ><p class="msg ellipsis">{@html chat.msg||"empty chat"}</p><div class="time"
-                > {formatTime(chat.time)}</div
-              >
+            <div class="last-message">
+              <p class="msg ellipsis">{@html chat.msg || "empty chat"}</p>
+              <div class="time">{formatTime(chat.time)}</div>
             </div>
           </div>
         </div>
       {/each}
     </section>
     {#if users.length == 0}
-      <p>There are no users found for query: {searchQuery}</p>
+      {#if searchQuery != ""}
+        <p>There are no users found for query: {searchQuery}</p>
+      {:else}
+        <!-- loading users -->
+        <div class="loader">
+          <i class="fa fa-spinner fa-spin" />
+          <span> getting users...</span>
+        </div>
+      {/if}
     {/if}
   </div>
-  <Snackbar {msg}/>
+  <Snackbar {msg} />
   <ModalBottom isOpen={isSheetOpen}>hello</ModalBottom>
 </main>
 
@@ -158,15 +166,14 @@
     margin: 0;
   }
   .item {
-    margin: 0;
-    padding: 20px 10px;
+    padding: 2px 10px;
     border-radius: 4px;
-    width: calc(100% - 20px);
     display: flex;
     align-items: center;
     cursor: pointer;
     background-color: var(--color-light);
-    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0px -0.3px 0 rgba(0, 0, 0, 0.2); */
+    border-bottom: 1px solid var(--color-line);
   }
   .item:hover {
     background-color: #f2f2f2;
@@ -197,15 +204,20 @@
     width: 200px;
   }
   .ellipsis {
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   .last-message .time {
     display: flex;
     width: 100%;
     justify-content: end;
+  }
+  .loader {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
   }
 </style>
