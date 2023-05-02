@@ -1,55 +1,74 @@
 <script>
-	import { fly } from 'svelte/transition';
+  import { fly } from "svelte/transition";
+
   export let isOpen = false;
-  let startY = 0;
-  let startHeight = 0;
+  export let info = {};
+
+  let startY, startHeight, max;
   let handle = null;
-  let max = false;
   let isInfo = true;
 
-  export let info = {};
-  const toggleSheet = () => {
+  function toggleSheet() {
     if (handle) {
       handle.parentNode.style.height = `fit-content`;
     }
     isOpen = !isOpen;
-  };
-  const resize = () => {
+  }
+
+  function resize() {
     if (!handle) return;
     if (!max) return;
     handle.parentNode.style.height = `fit-content`;
-  };
-
-  const handleTouchStart = (event) => {
-    event.preventDefault();
-    startY = event.touches[0].clientY;
-    startHeight = handle.parentNode.offsetHeight;
-    document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("touchend", handleTouchEnd);
-  };
-
-  const handleTouchMove = (event) => {
-    const deltaY = startY - event.touches[0].clientY;
-    const newHeight = startHeight + deltaY;
-    if (newHeight >= 500) return (max = true);
-    handle.parentNode.style.height = `${newHeight}px`;
-    requestAnimationFrame(() => {
-      handle.parentNode.style.height = `${newHeight}px`;
-    });
-  };
-
-  const handleTouchEnd = () => {
-    document.removeEventListener("touchmove", handleTouchMove);
-    document.removeEventListener("touchend", handleTouchEnd);
-  };
-  function showInfo(info) {
-    if (info) return false;
-    return;
   }
+
+  function showInfo(info) {
+    return !info;
+  }
+
   $: isInfo = showInfo(info);
 
-  $: if (isOpen == true) {
-    // disable scroll when modal is open
+  function touchHandlers(node) {
+    let sheet = node.parentNode;
+
+    function handleTouchStart(event) {
+      event.preventDefault();
+      startY = event.touches[0].clientY;
+      startHeight = sheet.offsetHeight;
+      max = false;
+      sheet.classList.add("is-resizing");
+    }
+
+    function handleTouchMove(event) {
+      const deltaY = startY - event.touches[0].clientY;
+      const newHeight = startHeight + deltaY;
+      if (newHeight >= 500) {
+        max = true;
+      } else {
+        sheet.style.height = `${newHeight}px`;
+        requestAnimationFrame(() => {
+          sheet.style.height = `${newHeight}px`;
+        });
+      }
+    }
+
+    function handleTouchEnd() {
+      sheet.classList.remove("is-resizing");
+    }
+
+    node.addEventListener("touchstart", handleTouchStart);
+    node.addEventListener("touchmove", handleTouchMove);
+    node.addEventListener("touchend", handleTouchEnd);
+
+    return {
+      destroy() {
+        node.removeEventListener("touchstart", handleTouchStart);
+        node.removeEventListener("touchmove", handleTouchMove);
+        node.removeEventListener("touchend", handleTouchEnd);
+      },
+    };
+  }
+
+  $: if (isOpen) {
     document.body.style.overflow = "hidden";
   } else {
     document.body.style.overflow = "auto";
@@ -58,20 +77,33 @@
 
 <main>
   {#if isOpen}
-    <div class="bottom-sheet open" on:dblclick={resize} transition:fly={{ y: 200, duration: 500 }}>
+    <div
+      class="bottom-sheet open"
+      on:dblclick={resize}
+      transition:fly={{ y: 200, duration: 500 }}
+    >
       <div class="header">
         <div
           class="bottom-sheet-handle"
           on:click={toggleSheet}
-          on:touchstart={handleTouchStart}
           bind:this={handle}
+          use:touchHandlers
         />
 
         <div class="dropdown" hidden={isInfo}>
-          <i class="far fa-sharp {info.icon} icon" />
-          <div class="dropdown-content">
-            {info.txt}
-          </div>
+          {#if info.type == "info"}
+            <i class="far fa-sharp {info.icon} icon" />
+            <div class="dropdown-content">
+              {info.txt}
+            </div>
+          {:else if info.type == "action"}
+            <i
+              class="fa fa-sharp fa-light {info.icon} icon"
+              on:click={() => {
+                info.action();
+              }}
+            />
+          {/if}
         </div>
       </div>
       <slot />

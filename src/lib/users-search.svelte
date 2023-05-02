@@ -27,7 +27,7 @@
     });
     console.log(data);
     users = data.data;
-    !query && DB("set", "popular", data.data);
+    DB("set", "popular", data.data);
   }
 
   let selectedUser = null;
@@ -41,19 +41,17 @@
   }
 
   async function newFollow(user) {
-    console.log("🚀 ~ file: users-search.svelte:43 ~ newFollow ~ user:", user)
     await makeRequest("follow", "POST", {
       user_token: $login_token,
       following: user.uidusers,
     }).then((data) => {
       snackbar?.showSnackbar(data.data.msg);
-      console.log("🚀 ~ file: users-search.svelte:48 ~ newFollow ~ user:", user,msg)
       if(data.data.type == "success"){
         data.data.msg == "Followed" ? user.following = true : user.following = false;
-        DB("set", "popular", users);
-        makeSearch();
-      console.log("🚀 ~ file: users-search.svelte:48 ~ newFollow ~ user:", user)
       }
+    }).finally(() => {
+      DB("set", "popular", users);
+      makeSearch();
     });
   }
 

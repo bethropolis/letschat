@@ -15,11 +15,9 @@ export function DB(type = "", key = "", data = null) {
 
   if (type === "update") {
     data = typeof data === "string" ? JSON.parse(data) : data;
-    console.log("🚀 ~ file: db.js:18 ~ DB ~ data:", data)
-    
+
     storedData = JSON.parse(localStorageObj.getItem(key) || "{}");
     const updatedData = { ...storedData, ...data };
-    console.log("🚀 ~ file: db.js:22 ~ DB ~ updatedData:", updatedData)
     localStorageObj.setItem(key, JSON.stringify(updatedData));
     return;
   }
@@ -38,4 +36,3 @@ export function DB(type = "", key = "", data = null) {
 
   console.log("storage error");
 }
-

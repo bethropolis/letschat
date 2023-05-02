@@ -1,10 +1,16 @@
 <script>
-    import Header from "./header.svelte";
+  import VideoPlayer from "./ui/videoPlayer.svelte";
+  import Header from "./header.svelte";
   import Snackbar from "./ui/snackbar.svelte";
-  let activeTab = "ai";
+  import { makeRequest } from "../api";
+  import { login_token } from "../store";
+  let activeTab = "text";
   let textContent = "";
-  let imageURL;
-  let aiContent = "";
+  let user_token = $login_token;
+  let file;
+  let fileName;
+  let filePreview;
+  let type = "txt";
   let characterLimit = 100;
   let msg;
   let title = "Post";
@@ -12,47 +18,82 @@
     {
       title: "home",
       icon: "fas fa-home",
-      link: "home"
-    }
-  ]
+      link: "home",
+    },
+  ];
   const handleTabClick = (tab) => {
     activeTab = tab;
   };
 
-  const handleTextSubmit = () => {
-    // Submit text content to server
+  const handleTextSubmit = async () => {
     console.log("Submitting text content:", textContent);
+    await makeRequest("post", "POST", {
+      user_token,
+      content: textContent,
+      type,
+    }).then((response) => {
+      msg = response.data.msg;
+    });
     // Reset text content field
   };
 
-  const handleImageSubmit = () => {
-    // Submit image URL to server
-    console.log("Submitting image URL:", imageURL);
-    // Reset image URL field
-  };
+  const handleFileSubmit = async () => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("type", type);
+  formData.append("user_token", user_token);
+  console.log("Submitting file:", file);
+  await makeRequest("post", "POST", {
+    ...formData,
+    content: textContent,
+  }).then((response) => {
+    if (response.data.msg) {
+      msg = response.data.msg;
+    }
+  });
+  // Reset file field
+};
 
-  const handleAISubmit = () => {
-    // Submit AI-generated content to server
-    console.log("Submitting AI-generated content:", aiContent);
-    // Reset AI-generated content field
-  };
-  function handleImageUpload(event) {
-    const file = event.target.files[0];
+  function handleFileUpload(event) {
+    file = event.target.files[0];
+    fileName = file.name;
+    createFilePreview();
+    checkFileExtension();
+  }
+
+  function createFilePreview() {
     const reader = new FileReader();
     reader.onload = function (event) {
-      imageURL = event.target.result;
+      filePreview = event.target.result;
     };
     reader.readAsDataURL(file);
   }
 
-  const handleSubmit = () => {
+  function checkFileExtension() {
+    const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+    const videoExtensions = ["mp4", "avi", "mov", "wmv"];
+    const audioExtensions = ["mp3", "wav", "ogg", "aac"];
+    const extension = fileName.split(".").pop().toLowerCase();
+    if (imageExtensions.includes(extension)) {
+      console.log("Image file uploaded");
+      type = "img";
+    } else if (videoExtensions.includes(extension)) {
+      console.log("Video file uploaded");
+      type = "vid";
+    } else if (audioExtensions.includes(extension)) {
+      console.log("Audio file uploaded");
+      type = "mus";
+    } else {
+      console.log("Other file uploaded");
+    }
+  }
+
+  const handleSubmit = async () => {
     msg = `Submiting  &nbsp<i class="fa fa-spin fa-hourglass-1"></i>`;
     if (activeTab === "text") {
-      handleTextSubmit();
-    } else if (activeTab === "image") {
-      handleImageSubmit();
-    } else if (activeTab === "ai") {
-      handleAISubmit();
+      await handleTextSubmit();
+    } else if (activeTab === "file") {
+      await handleFileSubmit();
     }
   };
 
@@ -60,71 +101,66 @@
 </script>
 
 <main>
-  <Header {navOptions} {title}/>
+  <Header {navOptions} {title} />
   <div class="tabs">
     <button
       class={activeTab === "text" ? "active" : ""}
       on:click={() => handleTabClick("text")}>Text</button
     >
     <button
-      class={activeTab === "image" ? "active" : ""}
-      on:click={() => handleTabClick("image")}>Image</button
-    >
-    <button
-      class={activeTab === "ai" ? "active" : ""}
-      on:click={() => handleTabClick("ai")}>AI-generated</button
+      class={activeTab === "file" ? "active" : ""}
+      on:click={() => handleTabClick("file")}>File</button
     >
   </div>
 
   <div class="content">
-    {#if activeTab === "image"}
-      <div class="image-input">
-        {#if !imageURL}
+    {#if activeTab === "file"}
+      <div class="file-input">
+        {#if !file}
           <div class="upload-container">
-            <label for="image-upload" class="upload-button">
-              <span><i class="fa fa-upload" /> Upload Image </span></label
+            <label for="file-upload" class="upload-button">
+              <span><i class="fa fa-upload" /> Upload File </span></label
             >
             <input
               type="file"
-              id="image-upload"
-              accept="image/*"
-              on:change={handleImageUpload}
+              id="file-upload"
+              on:change={handleFileUpload}
               hidden
             />
           </div>
         {/if}
 
-        {#if imageURL}
-          <div class="image-container">
-            <img src={imageURL} alt="Uploaded Image" class="uploaded-image" />
+        {#if file}
+          <div class="file-container">
+            {#if filePreview}
+              <div class="preview">
+                {#if file.type.includes("image")}
+                  <img
+                    src={filePreview}
+                    alt="File Preview"
+                    class="selected-image"
+                  />
+                {:else if file.type.includes("video")}
+                  <VideoPlayer
+                    videoProps={{ src: filePreview, controls: true }}
+                  />
+                {:else if file.type.includes("audio")}
+                  <audio src={filePreview} controls class="selected-image" />
+                {:else}
+                  <p>{fileName}</p>
+                {/if}
+              </div>
+            {:else}
+              <p>{fileName}</p>
+            {/if}
             <i
               title="remove"
               class="fa fa-times"
-              on:click={() => (imageURL = "")}
+              on:click={() => {
+                file = null;
+                filePreview = null;
+              }}
             />
-          </div>
-        {/if}
-      </div>
-    {:else if activeTab === "ai"}
-      <div class="ai-input">
-        {#if !imageURL}      
-        <div class="prompt-container">
-          <label for="ai-prompt" class="prompt-label"
-            >Enter image description:</label
-          >
-          <input
-            type="text"
-            id="ai-prompt"
-            bind:value={aiContent}
-            class="prompt-input"
-            placeholder="Enter image prompt here..."
-          />
-        </div>
-     {/if}
-
-        {#if imageURL}
-          <div class="image-preview">
-            <img src={imageURL} alt="Selected Image" class="selected-image" />
           </div>
         {/if}
       </div>
@@ -232,7 +268,7 @@
     flex-direction: column;
     align-items: center;
     border: 2px dotted #ccc;
-    padding: 24px;
+    padding: 10px;
     border-radius: 8px;
     cursor: pointer;
   }
@@ -248,7 +284,7 @@
     padding: 8px 16px;
     background-color: var(--color-primary);
     color: white;
-    border-radius: 4px;
+    border-radius: 10px;
     font-size: 14px;
     margin-bottom: 16px;
   }
@@ -258,7 +294,7 @@
     margin-right: 8px;
   }
 
-  .image-container {
+  .file-container {
     margin-top: 16px;
     position: relative;
     border: 2px dotted #ccc;
@@ -270,63 +306,20 @@
     justify-content: center;
     cursor: pointer;
     width: 100%;
-    max-width: 200px;
   }
 
-  .uploaded-image {
-    max-width: 100%;
+  .file-container {
+    max-width: 90%;
     height: auto;
-    margin-bottom: 16px;
+    margin: 0 auto 16px;
     object-fit: contain;
   }
-  .image-container .fa {
+  .file-container .fa {
     position: absolute;
     bottom: 0;
     right: 5px;
     font-size: 2em;
     cursor: pointer;
-  }
-
-  /* AI */
-  .ai-input {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 32px;
-  }
-
-  .prompt-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 16px;
-    width: 90%;
-  }
-
-  .prompt-label {
-    font-size: 16px;
-    margin-bottom: 8px;
-  }
-
-  .prompt-input {
-    padding: 8px;
-    border-radius: 4px;
-    border: 2px solid #ccc;
-    font-size: 16px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .image-preview {
-    margin-bottom: 16px;
-    width: 100%;
-    height: 250px;
-    border: 2px dotted #ccc;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
   }
 
   .selected-image {

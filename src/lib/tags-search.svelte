@@ -10,6 +10,11 @@
   export let type;
 
   export async function makeSearch() {
+    if (!query) {
+      if (DB("get", "prevTags")) {
+        return (posts = DB("get", "prevTags"));
+      }
+    }
     const { data } = await makeRequest("search", "GET", {
       user_token,
       query,
@@ -18,6 +23,11 @@
     DB("set", "prevTags", data.data);
     posts = data.data;
   }
+
+  onMount(() => {
+    posts = [];
+    makeSearch();
+  })
 </script>
 
 <main>

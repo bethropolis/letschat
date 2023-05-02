@@ -2,6 +2,7 @@
   import { convertDateToTime } from "../../extra";
   import { makeRequest } from "../../api";
   import { DB } from "../../db";
+  import VideoPlayer from "./videoPlayer.svelte";
 
   let messages = [];
   let start = 1;
@@ -17,7 +18,10 @@
   let y;
   async function updateChatWith() {
     chatwith = (await users.find((user) => user.username === username)) || {};
-    console.log("🚀 ~ file: chatbox.svelte:20 ~ updateChatWith ~ chatwith:", chatwith)
+    console.log(
+      "🚀 ~ file: chatbox.svelte:20 ~ updateChatWith ~ chatwith:",
+      chatwith
+    );
   }
 
   async function getMessages(data) {
@@ -90,8 +94,8 @@
   $: if (key) {
     getMessages({ to: chatwith.chat_key, from: chat_key, start: 1 });
   }
-  $: if(messages){
-       setTimeout(() => {
+  $: if (messages) {
+    setTimeout(() => {
       y = document.body.scrollHeight;
     }, 300);
   }
@@ -105,7 +109,9 @@
   <div class="chat-box">
     {#each messages as message}
       <div
-        class="chat-bubble {message.sender == chat_key ? 'sender' : 'receiver'} {message.type}"
+        class="chat-bubble {message.sender == chat_key
+          ? 'sender'
+          : 'receiver'} {message.type}"
       >
         <div class="message">
           {#if message.sender !== chat_key}
@@ -115,10 +121,16 @@
           {/if}
 
           <div class="content">
-            {#if message.type === "image"}
+            {#if message.type === "image" || message.type === "img"}
               <img src={message.content} alt="shot" class="image" />
             {:else if message.type === "txt"}
               <div class="text">{@html renderText(message.content)}</div>
+            {:else if message.type === "vid"}
+              <div class="image">
+                <VideoPlayer
+                  videoProps={{ src: message.content, controls: true }}
+                />
+              </div>   
             {:else}
               <div class="text unsupported">unsuppoarted format</div>
             {/if}

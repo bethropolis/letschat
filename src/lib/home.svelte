@@ -24,5 +24,8 @@
 </main>
 
 <style>
-
+main{
+  width: 100%;
+  height: auto;
+}
 </style>

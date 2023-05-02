@@ -58,7 +58,7 @@
     border-radius: 5px;
     opacity: 0.8;
     transition: opacity 0.3s ease;
-    z-index: 99;
+    z-index: 199;
   }
 
   .snackbar p {

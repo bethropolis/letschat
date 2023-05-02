@@ -1,3 +1,6 @@
+import { DB } from "./db";
+import { nav } from "./route";
+
 const MILLISECONDS_PER_MINUTE = 60 * 1000;
 const MILLISECONDS_PER_HOUR = 60 * MILLISECONDS_PER_MINUTE;
 const MILLISECONDS_PER_DAY = 24 * MILLISECONDS_PER_HOUR;
@@ -40,3 +43,16 @@ export function convertDateToTime(dateString) {
   const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
   return `${formattedHours}:${formattedMinutes} ${ampm}`;
 }
+
+// logout 
+export const LogOut = function() {
+  let loggedInUser = DB("get", "login") || null; // assuming you store the logged-in user info in "user" key
+  let existingAcc = DB("get", "extAcc");
+
+  let filteredUsers = existingAcc.users.filter(user => user.username !== loggedInUser.username);
+
+  DB("clear");
+  DB("set", "extAcc", { users: filteredUsers });
+  nav("login");
+}
+

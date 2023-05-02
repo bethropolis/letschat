@@ -7,6 +7,9 @@
   import ModalBottom from "./ui/modalBottom.svelte";
   import { nav } from "../route";
   import { DB } from "../db";
+  import { snack } from "../snack";
+  import { LogOut } from "../extra";
+
   export let username = {
     title: "my profile",
     username: DB("get", "login", "username"),
@@ -14,10 +17,17 @@
       isOpen = !isOpen;
     },
   };
+  let info = {
+    icon: "fa-arrow-right-from-bracket",//
+    type: "action",
+    action: function () {
+      LogOut();
+    }
+  };
   let isOpen = false;
   export let page;
   const activePage = "profile";
-  let profile = {};
+  let profile = null;
   let is_switching = false;
   let navOptions = [
     {
@@ -26,7 +36,7 @@
       link: "settings",
     },
   ];
-  
+
   async function getProfile(user) {
     let name = typeof username == "object" ? username.username : username;
     name = user ? user : name;
@@ -37,13 +47,8 @@
     })
       .then((res) => {
         profile = res.data;
-        console.log(
-          "🚀 ~ file: profile.svelte:50 ~ getProfile ~ profile:",
-          profile
-        );
       })
       .catch((err) => {
-        console.log("🚀 ~ file: profile.svelte:51 ~ getProfile ~ err:", err);
       });
   }
 
@@ -52,8 +57,8 @@
   async function selectAccount(account) {
     is_switching = true;
     let ext_acc = DB("get", "extAcc");
-    DB('clear');
-    DB("set","extAcc",ext_acc);
+    DB("clear");
+    DB("set", "extAcc", ext_acc);
     await DB("set", "login", account);
     await DB("set", "token", account.user_token);
     $login_token = account.user_token;
@@ -63,7 +68,7 @@
     }, 1000);
     await setTimeout(() => {
       is_switching = false;
-    },1000);
+    }, 1000);
   }
 
   function switchAccount() {
@@ -72,9 +77,13 @@
   async function followUser() {
     await makeRequest("follow", "POST", {
       user_token: $login_token,
-      following: username ?? username.username,
+      following: typeof username === "object" ? username.username : username,
+    }).then((res) => {
+      if (res.data.type === "error") {
+        return snack(res.data.msg);
+      }
+      profile.isFollowing = !profile.isFollowing;
     });
-    profile.isFollowing = !profile.isFollowing;
   }
 
   function updatePage(newPage) {
@@ -87,29 +96,31 @@
 
 <main>
   <Header title={username} {navOptions} />
-
+ {#if profile}
   <div class="container">
     <div class="profile-details">
+
       <img src={profile.picture} alt="Profile picture" />
       <div class="user-name">
-        <h2>{profile.name === " " ? profile.username : profile.name}</h2>
-        <h3>@{profile.username}</h3>
-        <p class="muted">joined: {profile.date_joined}</p>
+        <h2>{profile.name === " " ? profile.username : profile.name||" "}</h2>
+        <h3>@{profile.username || ""}</h3>
+        <p class="muted">joined: {profile.date_joined||""}</p>
       </div>
     </div>
     <div class="info">
       <div class="bio"><p>{profile.bio || "im using suplike"}</p></div>
     </div>
     <div class="numbers">
-      <span class="posts" title="Posts">{profile.posts?.length} posts</span>
+      <span class="posts" title="Posts">{profile.post||""} posts</span>
       <span class="followers" title="Followers"
-        >{profile.followers} followers</span
+        >{profile.followers||""} followers</span
       >
       <span class="following" title="Following"
-        >{profile.following} following</span
+        >{profile.following||""} following</span
       >
     </div>
     <div class="actions flex">
+      {#if DB('get',"login","username") != profile.username}
       <button
         on:click={followUser}
         class={profile.isFollowing ? "unfollow" : "follow"}
@@ -127,16 +138,18 @@
         <i class="fa fa-comment" />
         Chat
       </button>
+      {/if}
     </div>
   </div>
-  <div class="posts">
-  {#if profile && profile.posts?.length > 0}
-    {#each profile.posts as post}
-      <PostBox {post} />
-    {/each}
   {/if}
-</div>
-  <ModalBottom bind:isOpen>
+  <div class="posts-page">
+    {#if profile && profile.posts?.length > 0}
+      {#each profile.posts as post}
+        <PostBox {post} />
+      {/each}
+    {/if}
+  </div>
+  <ModalBottom bind:isOpen {info}>
     {#if !is_switching && isOpen}
       <div class="modal-content">
         <h2>login with existing account</h2>
@@ -156,7 +169,11 @@
       <!-- a loader is shown, switching accounts -->
       <div class="loader">
         <i class="fa fa-spinner fa-spin" />
+          {#if DB('get',"login","username") != profile.username}
         <span> switching accounts...</span>
+        {:else}
+        <span>you're logged in...</span>
+        {/if}
       </div>
     {/if}
   </ModalBottom>
@@ -297,11 +314,9 @@
     margin-right: 10px;
   }
 
-  .posts{
+  .posts-page {
     margin-bottom: 4.5em;
   }
-
-
 
   .modal-content {
     position: relative;

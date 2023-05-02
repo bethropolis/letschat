@@ -7,42 +7,40 @@
   import { DB } from "../db";
   import { formatTime } from "../extra";
 
+  const user_token = DB("get", "token"); // user
+  const user_username = DB("get", "login", "username");
+  const user_profile = DB("get", "login", "profile_picture");
+  let comments = [];
+  
   let modalComment = false;
   let disableBtn = false;
   export let post = "";
-  let user_token = DB("get", "token"); // user
-  let user_username = DB("get", "login", "username");
-  let user_profile = DB("get", "login", "profile_picture");
   let reply;
   let replyId = ""; // parent_id
   let replyTo = "";
-  let comments = [];
-
   let snack_msg;
-
-  let title = "hello";
-
+  let title = "comments";
   let info = {
-    icon: "fa-circle-question",
+    icon: "fa-circle-question",//
+    type: "info",
     txt: "hey, type your comments and click the add comment button",
   };
 
   const getComments = async (user_token, post_id) => {
-    await makeRequest("comment", "GET", { user_token, post_id }).then(
-      (response) => {
-        if (response.data.type == "success") {
-          comments = response.data.data || [];
-        } else {
-          comments = [];
-          modalComment = true;
-        }
-      }
-    );
+    const response = await makeRequest("comment", "GET", {
+      user_token,
+      post_id,
+    });
+    if (response.data.type === "success") {
+      comments = response.data.data || [];
+    } else if (comments.length === 0) {
+      modalComment = true;
+    }
   };
 
   const sendComment = async (comment) => {
-    await makeRequest("comment", "POST", comment);
-    if (Response) {
+    const response = await makeRequest("comment", "POST", comment);
+    if (response) {
       getComments(user_token, post);
     } else {
       snack_msg = "failed to send";
@@ -58,7 +56,7 @@
     const username = user_username;
     const comment = replyTo ? `${replyTo} ${reply}` : reply;
 
-    let params = {
+    const params = {
       post_id: post,
       comment,
       user_token,
@@ -77,13 +75,17 @@
     replyTo = user;
   };
 
-  // yeah this one is normal toggle and on toggle
   const toggleModal = (open = false) => {
     if (open) {
-      if (replyTo) return (replyTo = null) && (replyId = null);
-      return (modalComment = !modalComment);
+      if (replyTo) {
+        replyTo = null;
+        replyId = null;
+      } else {
+        modalComment = !modalComment;
+      }
+    } else {
+      modalComment = true;
     }
-    modalComment = true;
   };
 
   const snackMessage = (msg) => {
@@ -254,7 +256,7 @@
 
   .comment {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
     margin-bottom: 1rem;
   }
 
@@ -286,7 +288,7 @@
   .reply {
     display: flex;
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   .reply img {

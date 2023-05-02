@@ -8,6 +8,7 @@
   import TagsSearch from "./tags-search.svelte";
 
   export let location;
+  console.log("🚀 ~ file: profile.svelte:11 ~ location:", location);
   let params = {};
   let posts;
   let users;
@@ -26,20 +27,29 @@
 
   onMount(() => {
     if (activetab == "users") users.makeSearch();
+
+    if (params && params.q) {
+      search = params.q;
+      doSearch();
+    }
   });
 
-  $: if (params && params.q) {
-    activetab = "posts";
-    search = params.q;
-    // doSearch();
-  }
-
   $: if (location) {
-    const urlParams = new URLSearchParams(location.search);
-    for (let [key, value] of urlParams.entries()) {
-      params[key] = value;
-    }
+  const urlParams = new URLSearchParams(location.search);
+  if (urlParams.get("posts") !== null) {
+    activetab = "posts";
   }
+  if (urlParams.get("users") !== null) {
+    activetab = "users";
+  }
+  if (urlParams.get("tags") !== null) {
+    activetab = "tags";
+  }
+  urlParams.forEach((value, key) => {
+    params[key] = value;
+  });
+}
+
 </script>
 
 <main>
@@ -93,7 +103,7 @@
         bind:query={search}
       />
     {:else if activetab == "tags"}
-    <TagsSearch bind:this={tags} bind:type={activetab} bind:query={search} />
+      <TagsSearch bind:this={tags} bind:type={activetab} bind:query={search} />
     {:else}
       <div class="alert">
         <!-- a big icon to tell user should search something -->
