@@ -1,15 +1,23 @@
 <script>
+  import { login_token } from "../store.js";
+  import { DB } from "../db.js";
   import { nav } from "../route.js";
   export let activePage = "";
-
+  let profilePicture ;
   function setActivePage(ispage, num) {
     activePage = ispage;
     nav(ispage);
   }
+
+  function getProfilePicture() {
+   profilePicture = DB("get", "login", "profile_picture"); 
+  }
   export { setActivePage };
+
+  $: $login_token && getProfilePicture();
 </script>
 
-<main>  
+<main>
   <!-- svelte-ignore component-name-lowercase -->
   <nav>
     <a
@@ -29,19 +37,35 @@
       <span>Search</span>
     </a>
     <a
+      class:selected={activePage === "post"}
+      href="#"
+      on:click|preventDefault={() => setActivePage("post", 8)}
+    >
+      <i class="fas fa-plus" />
+      <span>post</span>
+    </a>
+    <a
       class:selected={activePage === "notifications"}
       href="#"
       on:click|preventDefault={() => setActivePage("notification", 10)}
     >
       <i class="fas fa-bell" />
-      <span>Notifications</span>
+      <span>activity</span>
     </a>
     <a
       class:selected={activePage === "profile"}
       href="#"
       on:click|preventDefault={() => setActivePage("profile", 4)}
     >
-      <i class="fas fa-user" />
+      {#if profilePicture}
+        <img
+          src={profilePicture}
+          alt="profile picture"
+          class="profile-picture"
+        />
+      {:else}
+        <i class="fas fa-user" />
+      {/if}
       <span>Profile</span>
     </a>
   </nav>
@@ -93,6 +117,11 @@
   a i {
     font-size: 20px;
     user-select: none;
+  }
+  img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
   }
 
   a span {

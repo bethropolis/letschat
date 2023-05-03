@@ -248,7 +248,23 @@
     font-size: 1rem;
     font-weight: bold;
   }
-
+ button[type=submit] {
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    border: none;
+    padding: 12px;
+    width: 95%;
+    font-size: large;
+    border-radius: calc(var(--spacing-large) / 2);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: 0.2s all;
+  }
+  button[type=submit]:hover {
+    background-color: var(--color-light);
+    color: var(--color-primary);
+    outline: 2px solid var(--color-primary);
+  }
   button:hover {
     opacity: 0.7;
     background-color: var(--color-primary);

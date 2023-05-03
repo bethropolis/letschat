@@ -6,13 +6,29 @@ const api_token = config.api_key;
 const version_no = config.version_no;
 
 export async function makeRequest(endpoint, method, data = {}, headers = {}) {
-  const params = new URLSearchParams({ api_key: api_token, ...data });
-  const url = `${BASE_URL}/api/v${version_no}/${endpoint}/?${params.toString()}`;
+  let url = `${BASE_URL}/api/v${version_no}/${endpoint}/`;
   const config = { method, headers };
   if (method !== "GET") {
-    config.headers["Content-Type"] = "application/x-www-form-urlencoded";
-    config.data = params.toString();
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(data)) {
+      if (key === "file") {
+        formData.append(key, value, value.name);
+      } else {
+        formData.append(key, value);
+      }
+    }
+    config.headers["Content-Type"] = "multipart/form-data";
+    config.data = formData;
+  } else {
+    const params = new URLSearchParams({ api_key: api_token, ...data });
+    url += `?${params.toString()}`;
   }
-  return await axios(url, config);
+  config.headers.Authorization = `Bearer ${api_token}`;
+  try {
+    const response = await axios(url, config);
+    return response;
+  } catch (error) {
+    console.error("Error occurred during request: ", error);
+    throw error;
+  }
 }
-

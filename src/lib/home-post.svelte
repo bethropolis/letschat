@@ -33,6 +33,9 @@
       const response = await makeRequest("post", "GET", {
         user_token,
         last_id: lastPostId,
+      }).then((res) =>{
+         // check if response is json
+         return res;
       });
       newData = response.data;
     }
@@ -72,6 +75,7 @@
       timestamp: DB("get", "homePost", "timestamp"),
     };
     DB("update", "homePost", JSON.stringify(data));
+
   }
 </script>
 

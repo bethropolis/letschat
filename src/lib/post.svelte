@@ -4,6 +4,7 @@
   import Snackbar from "./ui/snackbar.svelte";
   import { makeRequest } from "../api";
   import { login_token } from "../store";
+  import MusicPlayer from "./ui/musicPlayer.svelte";
   let activeTab = "text";
   let textContent = "";
   let user_token = $login_token;
@@ -38,21 +39,19 @@
   };
 
   const handleFileSubmit = async () => {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("type", type);
-  formData.append("user_token", user_token);
-  console.log("Submitting file:", file);
-  await makeRequest("post", "POST", {
-    ...formData,
-    content: textContent,
-  }).then((response) => {
-    if (response.data.msg) {
-      msg = response.data.msg;
-    }
-  });
-  // Reset file field
-};
+
+    await makeRequest("post", "POST", {
+      user_token,
+      file,
+      type,
+      content:textContent,
+    }).then((response) => {
+      console.log("🚀 ~ file: post.svelte:51 ~ awaitmakeRequest ~ response:", response)
+      if (response.data.msg) {
+        msg = response.data.msg;
+      }
+    });
+  };
 
   function handleFileUpload(event) {
     file = event.target.files[0];
@@ -93,6 +92,7 @@
     if (activeTab === "text") {
       await handleTextSubmit();
     } else if (activeTab === "file") {
+      console.log("submitting");
       await handleFileSubmit();
     }
   };
@@ -145,7 +145,7 @@
                     videoProps={{ src: filePreview, controls: true }}
                   />
                 {:else if file.type.includes("audio")}
-                  <audio src={filePreview} controls class="selected-image" />
+                  <MusicPlayer musicProps={{src: filePreview, controls: true }} />
                 {:else}
                   <p>{fileName}</p>
                 {/if}

@@ -5,3 +5,7 @@ import { DB } from "./db";
 
 // create an user_token variable that is a writable store
 export const login_token = writable(DB('get','token'));
+
+export const current = writable(null);
+
+export const is_playing = writable(false);

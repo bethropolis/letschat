@@ -1,9 +1,9 @@
 <script>
   import { onMount } from "svelte";
-  import image from "../assets/chat.svg";
+  import image from "../assets/intro.png";
   import { nav } from "../route";
   import { DB } from "../db";
-
+  let main;
   function handleActionClick() {
     nav("login");
   }
@@ -11,18 +11,42 @@
     if (DB("get", "login")) {
       nav("home");
     }
+    
   });
+
+  let toggleFullScreen = function(){
+    main.requestFullscreen();
+  };
 </script>
 
-<main>
+<main bind:this={main}>
   <div class="cover">
     <img class="image" src={image} />
+    <div class="shadow" />
   </div>
   <div class="text">
-    <p>
-      welcome to suplike chat app, connecting you with the people around you
-    </p>
-    <button class="btn" on:click={handleActionClick}>get started</button>
+    <div class="button">
+      <button class="btn" on:click={handleActionClick}
+        >Sign up to suplike</button
+      >
+    </div>
+
+    <div class="button">
+      <button class="btn self">select your own server</button>
+    </div>
+  </div>
+  <div class="container">
+    <span class="line" />
+    <span class="or">or</span>
+    <span class="line" />
+  </div>
+  <div class="footer">
+    <div class="item">
+      <a href="http://">Github</a>
+    </div>
+    <div class="item">
+      <a href="#" on:click={toggleFullScreen}>Log in</a>
+    </div>
   </div>
 </main>
 
@@ -34,42 +58,114 @@
     overflow-y: hidden;
   }
   .cover {
+    position: relative;
     display: grid;
     align-items: center;
     justify-content: center;
-    height: 90vh;
+    height: 72vh;
   }
   .image {
-    margin: 0 auto;
-    padding: 1em 2vw;
-    width: 92%;
+    position: relative;
+    width: 100%;
     height: auto;
+    object-fit: contain;
+  }
+  .shadow {
+    position: relative;
+    width: 100%;
+    height: 1px;
+    bottom: -10px; /* adjust this value to change the distance of the shadow */
+    left: 0;
+    transform: scale(
+      0.5
+    ); /* adjust this value to change the size of the shadow */
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
   }
   .text {
     width: 100%;
     text-align: center;
-    position: absolute;
-    bottom: 2vh;
+    position: relative;
     font-size: 1.4em;
     color: white;
     font-family: monospace;
   }
-  .btn {
-    width: 60vw;
-    max-width: 200px;
-    padding: 15px;
-    border-radius: 30px;
-    font-size: 1.2rem;
-    border: none;
-    outline: none;
-    background: #6c5ce7;
-    color: white;
-    transition: 0.1s all;
+  .button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    margin-top: 0.5em;
   }
-  .btn:active {
-    background: white;
-    color: #6c5ce7;
-    box-shadow: 0 0 7px #6c5ce7;
-    transition: 1s all;
+  button.btn {
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    border: none;
+    padding: 12px;
+    width: 95%;
+    font-size: large;
+    border-radius: calc(var(--spacing-medium) / 2);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: 0.2s all;
+  }
+  button.btn:hover:not(.self) {
+    background-color: var(--color-light);
+    color: var(--color-primary);
+    outline: 2px solid var(--color-primary);
+  }
+
+  button.self {
+    background-color: var(--lilac);
+  }
+  button.self:hover {
+    background-color: var(--color-light);
+    color: var(--lilac);
+    outline: 2px solid var(--lilac);
+  }
+  .container {
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    margin-top: 1em;
+  }
+
+  .line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-line);
+  }
+
+  .or {
+    color: white;
+    margin: 0 10px;
+    font-size: 20px;
+  }
+
+  .footer {
+    margin-top: 1em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 95%;
+    margin: 0 auto;
+  }
+  .item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+  .item a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.2em;
+    margin: 0 10px;
+    transition: 0.2s all;
+  }
+  .item a:hover {
+    color: var(--color-primary);
+    opacity: 0.8;
   }
 </style>

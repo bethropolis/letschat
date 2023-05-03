@@ -1,5 +1,5 @@
 <script>
-	import Lightbox from './lightbox.svelte';
+  import Lightbox from "./lightbox.svelte";
   import { login_token } from "../../store";
   import { makeRequest } from "../../api";
   import { createEventDispatcher } from "svelte";
@@ -7,8 +7,8 @@
   import config from "../../app.json";
   import Snackbar from "./snackbar.svelte";
   import { DB } from "../../db";
-  import VideoPlayer from './videoPlayer.svelte';
-
+  import VideoPlayer from "./videoPlayer.svelte";
+  import MusicPlayer from "./musicPlayer.svelte";
 
   let src;
   let lightbox;
@@ -19,11 +19,16 @@
   async function likePost() {
     await makeRequest("like", "POST", {
       user_token,
-      post_id: post.post_id,
+      post_id: post.id,
     }).then((response) => {
       if (response.data.type === "success") {
-        post.liked = !post.liked;
-        post.liked ? post.post_likes++ : post.post_likes--;
+        if(response.data.msg === "Liked"){
+          post.liked = true;
+          post.post_likes++;
+        }else{
+          post.liked = false;
+          post.post_likes--;
+        }
       }
       dispatch("like");
     });
@@ -62,50 +67,51 @@
 <main>
   <article class="post">
     <Lightbox bind:this={lightbox}>
-        <div class="post-header user-info lightbox-header" slot="header">
-          <div class="left">
+      <div class="post-header user-info lightbox-header" slot="header">
+        <div class="left">
           <img
             src={`${config.base_url}/img/${post.user.profile_picture}`}
-            alt={post.user.name}
+            alt={post.user?.name}
             class="user-avatar"
             on:click={goToProfile}
           />
           <div class="user-name-date">
-            <h3 class="user-name">{post.user.name}</h3>
+            <h3 class="user-name">{post.user?.name || ""}</h3>
             <p class="post-date">{post.date_posted}</p>
           </div>
         </div>
         <div class="right">
-           <a href={`${config.base_url}/img/${post.image}`} download={post.image_text}>
-          <button class="post-download-button">
-            <i class="fas fa-download" />
-          </button>
-          </a> 
-            <button on:click={closeLightbox}>
-                <i class="fa fa-close">
+          <a
+            href={`${config.base_url}/img/${post.image}`}
+            download={post.image_text}
+          >
+            <button class="post-download-button">
+              <i class="fas fa-download" />
             </button>
+          </a>
+          <button on:click={closeLightbox}> <i class="fa fa-close" /></button>
         </div>
       </div>
       <div class="lightbox">
-      <button class="post-action-button" on:click={likePost}>
-        <i
-          class="{post.liked ? 'fas' : 'far'} fa-heart post-action-icon"
-        />{post.post_likes}
-      </button>
-      <button class="post-action-button">
-        <i class="far fa-comment post-action-icon" on:click={goToComments} />
-        {post.comment_count || 0}
-      </button>
-      <button class="post-action-button" on:click={repostPost}>
-        <i class="fas fa-retweet post-action-icon" />
-      </button>
-      <button class="post-action-button">
-        <i class="fas fa-share post-action-icon" />
-      </button>
-    </div>
-    <div class="text" slot="footer">
-      <p>{post.image_text}</p>
-    </div>
+        <button class="post-action-button" on:click={likePost}>
+          <i
+            class="{post.liked ? 'fas' : 'far'} fa-heart post-action-icon"
+          />{post.post_likes}
+        </button>
+        <button class="post-action-button">
+          <i class="far fa-comment post-action-icon" on:click={goToComments} />
+          {post.comment_count || 0}
+        </button>
+        <button class="post-action-button" on:click={repostPost}>
+          <i class="fas fa-retweet post-action-icon" />
+        </button>
+        <button class="post-action-button">
+          <i class="fas fa-share post-action-icon" />
+        </button>
+      </div>
+      <div class="text" slot="footer">
+        <p>{post.image_text}</p>
+      </div>
     </Lightbox>
     <header class="post-header">
       <div class="user-info">
@@ -117,31 +123,45 @@
         />
         <div class="user-name-date">
           <h3 class="user-name">{post.user.name}</h3>
-          <p class="post-date">{post.date_posted ||"" }</p>
+          <p class="post-date">{post.date_posted || ""}</p>
         </div>
       </div>
       <div class="dropdown">
         <button><i class="fa fa-ellipsis" /></button>
         <ul>
-          {#if post.user.name == username}  
-          <li>Delete</li>
+          {#if post.user.name == username}
+            <li>Delete</li>
           {/if}
-           <li>Report</li>
-           <li>Share</li>
+          <li>Report</li>
+          <li>Share</li>
           <li>Embed</li>
         </ul>
       </div>
     </header>
     <div class="post-body">
-      {#if post.type == 'img'}
+      {#if post.type == "img"}
         <img
           src={`${config.base_url}/img/${post.image}`}
           alt={post.image_text}
           class="post-image"
-          on:click={()=>{showLightbox(`${config.base_url}/img/${post.image}`)}}
+          on:click={() => {
+            showLightbox(`${config.base_url}/img/${post.image}`);
+          }}
         />
-        {:else if post.type == 'vid'}
-        <VideoPlayer  videoProps={{ src: `${config.base_url}/img/${post.image}`, controls: true }}/>
+      {:else if post.type == "vid"}
+        <VideoPlayer
+          videoProps={{
+            src: `${config.base_url}/img/${post.image}`,
+            controls: true,
+          }}
+        />
+      {:else if post.type == "mus"}
+        <MusicPlayer
+          musicProps={{
+            src: `${config.base_url}/img/${post.image}`,
+            controls: true,
+          }}
+        />
       {:else}
         <p class="post-text">{@html post.image_text}</p>
       {/if}
@@ -284,20 +304,20 @@
     justify-content: space-between;
   }
 
-  .post-footer button{
+  .post-footer button {
     background-color: transparent;
     border: none;
     color: #9b9b9b;
     cursor: pointer;
     font-size: 16px;
   }
-  .lightbox{
+  .lightbox {
     width: 100%;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
   }
-  .lightbox-header{
+  .lightbox-header {
     position: absolute;
     top: 0;
     left: 0;
@@ -307,31 +327,33 @@
     justify-content: space-between;
     align-items: center;
   }
-  .left,.right{
+  .left,
+  .right {
     width: 50%;
     display: flex;
     height: 100%;
   }
-  .right{
+  .right {
     justify-content: flex-end;
   }
 
-  .lightbox-header .user-name{
+  .lightbox-header .user-name {
     color: var(--color-primary-dark);
   }
-  .text{
+  .text {
     position: relative;
     top: 4em;
     color: var(--color-light);
     z-index: 106;
   }
-  .lightbox button, .right button{
+  .lightbox button,
+  .right button {
     border: none;
     background-color: transparent;
     color: #9b9b9b;
-   font-size: 20px; 
+    font-size: 20px;
   }
-  .right button{
+  .right button {
     padding: 0.8rem;
     color: var(--color-lighter);
     font-size: 1.4em;

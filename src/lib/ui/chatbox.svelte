@@ -3,6 +3,7 @@
   import { makeRequest } from "../../api";
   import { DB } from "../../db";
   import VideoPlayer from "./videoPlayer.svelte";
+  import MusicPlayer from "./musicPlayer.svelte";
 
   let messages = [];
   let start = 1;
@@ -131,6 +132,10 @@
                   videoProps={{ src: message.content, controls: true }}
                 />
               </div>   
+              {:else if message.type === "mus"}
+              <div class="image">
+                <MusicPlayer musicProps={{ src: message.content }} />
+              </div>
             {:else}
               <div class="text unsupported">unsuppoarted format</div>
             {/if}

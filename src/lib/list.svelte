@@ -1,11 +1,11 @@
 <script>
+  import { current } from "../store";
   import Snackbar from "./ui/snackbar.svelte";
   import { onMount } from "svelte";
   import ModalBottom from "./ui/modalBottom.svelte";
   import { nav } from "../route";
   import { formatTime } from "../extra";
   import { DB } from "../db";
-  import config from "../app.json";
 
   export let chats = [];
   export let users = [];

@@ -1,4 +1,5 @@
 <script>
+	import { current } from '../store';
   import { onMount } from "svelte";
   import Header from "./header.svelte";
   import Chatinput from "./ui/chatinput.svelte";
@@ -7,6 +8,7 @@
   import { makeRequest } from "../api";
   import { isCurrentPage } from "../route";
   import { DB } from "../db";
+
 
   export let location;
   let user_token = DB("get", "token");
@@ -37,6 +39,7 @@
       users = getStoredChatList();
     }
   });
+
 </script>
 
 <main>

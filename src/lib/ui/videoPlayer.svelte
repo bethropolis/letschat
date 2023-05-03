@@ -1,6 +1,7 @@
 <script context="module">
-	let current;
+  import { current } from "../../store";
 </script>
+
 <script>
   import { onMount } from "svelte";
 
@@ -16,7 +17,6 @@
   let onScreen;
   let sidebarOpen = false;
   let fullscreen = false;
-  console.log(videoProps);
 
   // Function to play video
   function play() {
@@ -153,10 +153,10 @@
           on:pause={pause}
           on:play={(e) => {
             const video = e.currentTarget;
-      
-            if (video !== current) {
-              current?.pause();
-              current = video;
+
+            if (video !== $current) {
+              $current?.pause();
+              $current = video;
             }
           }}
         >
@@ -185,57 +185,58 @@
         </div>
       </div>
     </div>
-    {#if videoProps.controls}
-    <div class="controls">
-      <button class="btn" on:click={togglePlay}>
-        {#if isPlaying}
-          <i class="fas fa-pause" />
-        {:else}
-          <i class="fas fa-play" />
-        {/if}
-      </button>
-      <input
-        class="slider"
-        type="range"
-        min="0"
-        max="100"
-        step="0.01"
-        value={timeFrame}
-        on:input={seek}
-        style="flex: 1;"
-      />
-      <div class="time-remaining">{timeLength}</div>
-      <div class="volume">
-        <button class="btn" on:click={toggleMute}>
-          {#if videoPlayer?.muted}
-            <i class="fas fa-volume-mute" />
-          {:else if videoPlayer?.volume > 0.5}
-            <i class="fas fa-volume-up" />
+    {#if videoProps.controls || fullscreen}
+      <div class="controls">
+        <button class="btn" on:click={togglePlay}>
+          {#if isPlaying}
+            <i class="fas fa-pause" />
           {:else}
-            <i class="fas fa-volume-down" />
+            <i class="fas fa-play" />
           {/if}
         </button>
-        <button class="settings-btn btn" on:click={toggleSidebar}>
-          <i class="fas fa-cog" />
-        </button>
-        <button class="fullscreen-btn btn" on:click={toggleFullscreen}>
-          {#if fullscreen}
-            <i class="fas fa-compress" />
-          {:else}
-            <i class="fas fa-expand" />
-          {/if}
-        </button>
-      </div>
-      <div class="sidebar" class:active={sidebarOpen}>
-        <div class="sidebar-content">
-          <ul>
-            <li>disable controls
-              <input type="checkbox" bind:checked={videoProps.controls} />
-            </li>
-          </ul>
+        <input
+          class="slider"
+          type="range"
+          min="0"
+          max="100"
+          step="0.01"
+          value={timeFrame}
+          on:input={seek}
+          style="flex: 1;"
+        />
+        <div class="time-remaining">{timeLength}</div>
+        <div class="volume">
+          <button class="btn" on:click={toggleMute}>
+            {#if videoPlayer?.muted}
+              <i class="fas fa-volume-mute" />
+            {:else if videoPlayer?.volume > 0.5}
+              <i class="fas fa-volume-up" />
+            {:else}
+              <i class="fas fa-volume-down" />
+            {/if}
+          </button>
+          <button class="settings-btn btn" on:click={toggleSidebar}>
+            <i class="fas fa-cog" />
+          </button>
+          <button class="fullscreen-btn btn" on:click={toggleFullscreen}>
+            {#if fullscreen}
+              <i class="fas fa-compress" />
+            {:else}
+              <i class="fas fa-expand" />
+            {/if}
+          </button>
+        </div>
+        <div class="sidebar" class:active={sidebarOpen}>
+          <div class="sidebar-content">
+            <ul>
+              <li>
+                disable controls
+                <input type="checkbox" bind:checked={videoProps.controls} />
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
     {/if}
   </div>
 </main>
@@ -247,7 +248,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    max-width: 360px;
   }
   main:fullscreen {
     background: #000;
@@ -397,7 +397,7 @@
   .sidebar-content li {
     margin: 0.5rem 0;
   }
-  .sidebar-content li{
+  .sidebar-content li {
     color: var(--secondary-color);
     text-decoration: none;
   }

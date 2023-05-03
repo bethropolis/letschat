@@ -61,6 +61,7 @@
 
     return {
       destroy() {
+        document.body.style.overflow = "auto";
         node.removeEventListener("touchstart", handleTouchStart);
         node.removeEventListener("touchmove", handleTouchMove);
         node.removeEventListener("touchend", handleTouchEnd);
