@@ -158,7 +158,7 @@
             {#each existingAccounts as account}
               <li on:click={() => selectAccount(account)}>
                 <img src={account.profile_picture} alt={account.full_name} />
-                <span>{account.full_name}</span>
+                <span>{account.full_name === " " ? account.username : account.full_name}</span>
               </li>
             {/each}
           {/if}

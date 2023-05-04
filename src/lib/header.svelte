@@ -9,6 +9,7 @@
   export let title = "" || null;
   export let backTo = "";
   export let locked = false;
+  export let disableBack = false;
   let backButtonVisible = false;
 
   // Define a variable to store the timer
@@ -21,7 +22,6 @@
     }
 
     if (backButtonVisible && !to) {
-      // go to previous page -1
       history.back();
       backButtonVisible = false;
     }
@@ -63,7 +63,7 @@
 
 <main class:locked>
   <div class="header">
-    {#if backButtonVisible}
+    {#if backButtonVisible && !disableBack}
       <button
         class="back-button"
         on:click={() => handleBackButtonClick(backTo)}

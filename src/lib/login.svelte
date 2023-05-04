@@ -1,19 +1,21 @@
 <script>
   import { login_token } from "../store.js";
-  import swal from "sweetalert";
   import { makeRequest } from "../api.js";
   import { DB } from "../db.js";
   import { nav } from "../route.js";
+  import { snack } from "../snack.js";
+  import Header from "./header.svelte";
   const userData = {
     name: "",
     pass: "",
     email: "",
   };
+  let title = "login to account";
   let type = "login";
 
   async function login(userData) {
     if (DB("get", "login", "username") === userData.name) {
-      let accept = await swal("hey", "You are already loggedin", "info");
+      let accept = await snack("You are already loggedin");
       return nav("home");
     }
 
@@ -51,136 +53,154 @@
           DB("set", "token", response.data.user_token);
           $login_token = response.data.user_token;
           nav("home");
-          console.log(DB("get", "login", "user"));
         } else {
-          swal("Error", response.data.msg, "error");
+          snack(response.data.msg);
         }
       })
       .catch(function (error) {
         console.error(error);
       });
   }
+
+  function validate(type) {}
 </script>
 
+<Header {title} />
 <main>
-  {#if type === "login"}
-    <div class="form">
-      <h1>login</h1>
-      <input
-        type="text"
-        bind:value={userData.name}
-        placeholder="username..."
-        id="f_mail"
-      />
-      <input
-        type="password"
-        bind:value={userData.pass}
-        placeholder="password..."
-        id="f_pass"
-      />
-      <button
-        type="submit"
-        class="btn"
-        on:click={async () => await login(userData)}
-      >
-        login</button
-      >
-      <br />
-      <p>
-        Don't have an account <b
-          ><a on:click={() => (type = "signup")}>Signup</a></b
-        >
-        or <a href="#">forgot password?</a>
-      </p>
+  <div class="form">
+    <input
+      type="text"
+      bind:value={userData.name}
+      placeholder="username..."
+      id="f_mail"
+    />
+    <input
+      type="password"
+      bind:value={userData.pass}
+      placeholder="password..."
+      id="f_pass"
+    />
+
+    <button
+      type="submit"
+      class="sup_btn"
+      on:click={async () => await login(userData)}
+    >
+      login</button
+    >
+  </div>
+  <div class="container">
+    <span class="line" />
+    <span class="or">or</span>
+    <span class="line" />
+  </div>
+  <div class="footer">
+    <div class="item">
+      <a href="http://">help</a>
     </div>
-  {:else}
-    <div class="form">
-      <h1>sign up</h1>
-      <input
-        type="text"
-        bind:value={userData.name}
-        placeholder="username..."
-        id="f_mail"
-      />
-      <input
-        type="email"
-        bind:value={userData.email}
-        placeholder="email"
-        id="f_email"
-      />
-      <input
-        type="password"
-        bind:value={userData.pass}
-        placeholder="password..."
-        id="f_pass"
-      />
-      <button
-        type="submit"
-        class="btn"
-        on:click={async () => await login(userData)}
+    <div class="item">
+      <a
+        href="#"
+        on:click|preventDefault={() => {
+          nav("signup");
+        }}>sign up</a
       >
-        Signup</button
-      >
-      <br />
-      <p>
-        Already have an account? <a on:click={() => (type = "login")}>Login</a>
-      </p>
     </div>
-  {/if}
+  </div>
 </main>
 
 <style>
   main {
-    display: grid;
-    place-content: center;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     text-align: center;
   }
+
   a {
-    color: hsl(275, 100%, 56%);
+    color: var(--secondary-color);
   }
-  .h1 {
-    background: none;
-    padding: 0;
-    margin: 0;
-  }
+
   .form {
-    padding: 10vh 0;
+    margin-top: 3em;
     height: auto;
-    width: 100vw;
+    width: 100%;
     text-align: center;
   }
-  .btn {
-    width: 60vw;
-    max-width: 200px;
-    padding: 15px;
-    border-radius: 30px;
-    font-size: 1.2rem;
-    border: none;
-    outline: none;
-    background: #6c5ce7;
-    color: white;
-    transition: 0.1s all;
+
+  .sup_btn {
+    background-color: var(--primary-color);
+    width: 80%;
+    border-radius: calc(var(--spacing-large) / 2);
   }
-  .btn:active {
-    background: white;
-    color: #6c5ce7;
-    box-shadow: 0 0 7px #6c5ce7;
-    transition: 1s all;
-  }
+
   input {
-    width: 85%;
-    padding: 1em;
-    margin: 0.5rem 0;
-    background: #eee;
-    border-radius: 2px;
+    margin-bottom: 1em;
+    font-family: "Roboto", sans-serif;
+    font-size: 18px;
+    padding: 18px 12px;
+    width: 78vw;
+    border: 2px solid #ccc;
+    background-color: var(--color-lighter);
     outline: none;
-    border: none;
+    border-radius: 4px;
+    transition: all 0.3s ease-in-out;
   }
-  .form p {
-    width: 90%;
-    padding: 1em;
-    text-align: left;
+
+  input:focus {
+    /* Change the border color to a darker gray */
+    border-color: var(--primary-color);
+    /* Add a subtle box shadow */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  input::placeholder {
+    /* Use a lighter font color for the placeholder text */
+    color: #aaa;
+  }
+
+  .container {
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    margin-top: 1em;
+  }
+
+  .line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-line);
+  }
+
+  .or {
+    color: var(--text-dark);
+    margin: 0 10px;
+    font-size: 20px;
+  }
+
+  .footer {
+    margin-top: 1em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 95%;
+    margin: 0 auto;
+  }
+  .item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+  .item a {
+    text-decoration: none;
+    color: var(--mauve);
+    font-size: 1.2em;
+    margin: 0 10px;
+    transition: 0.2s all;
+  }
+  .item a:hover {
+    color: var(--color-primary);
+    opacity: 0.8;
   }
 </style>

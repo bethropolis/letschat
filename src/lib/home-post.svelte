@@ -7,9 +7,11 @@
 
   let user_token = $login_token;
   let posts = [];
-  let observer;
   let isLoading = false;
   let hasMorePosts = true;
+  let scrollInfo = "load more posts";
+  let loadMoreButton;
+
   const loadMorePosts = async () => {
     if (!hasMorePosts || isLoading) {
       return;
@@ -33,9 +35,11 @@
       const response = await makeRequest("post", "GET", {
         user_token,
         last_id: lastPostId,
-      }).then((res) =>{
-         // check if response is json
-         return res;
+      }).then((res) => {
+        if (res.data.length == 0) {
+          scrollInfo = "No more posts";
+        }
+        return res;
       });
       newData = response.data;
     }
@@ -49,6 +53,10 @@
     hasMorePosts = newData.length > 0;
   };
 
+  const loadMoreButtonClicked = async () => {
+    await loadMorePosts();
+  };
+
   onMount(() => {
     const options = {
       root: null,
@@ -56,17 +64,16 @@
       threshold: 1.0,
     };
 
-    observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && posts) {
         loadMorePosts();
       }
     }, options);
 
-    observer.observe(document.querySelector("#load-more"));
-  });
-
-  onDestroy(() => {
-    observer.disconnect();
+    observer.observe(loadMoreButton);
+    return () => {
+      observer.disconnect();
+    };
   });
 
   function StoreState() {
@@ -75,7 +82,6 @@
       timestamp: DB("get", "homePost", "timestamp"),
     };
     DB("update", "homePost", JSON.stringify(data));
-
   }
 </script>
 
@@ -88,10 +94,13 @@
       <span class="loader" />
       Loading more posts...
     {:else}
-      Scroll down to load more posts
+      <span bind:this={loadMoreButton} on:click={loadMoreButtonClicked}>
+        {scrollInfo}
+      </span>
     {/if}
   </div>
 </main>
+
 
 <style>
   /* Main component styles */

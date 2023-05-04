@@ -9,12 +9,12 @@
   import { onMount } from "svelte";
   let user_token = $login_token;
   let users = [];
-  export let query;
+  export let query = "";
   export let type;
   let msg;
   let snackbar;
   export async function makeSearch(pass=false) {
-    if (!query) {
+    if (query == "") {
       if (DB("get", "popular")) {
         return (users = DB("get", "popular"));
       }
@@ -51,7 +51,6 @@
       }
     }).finally(() => {
       DB("set", "popular", users);
-      makeSearch();
     });
   }
 

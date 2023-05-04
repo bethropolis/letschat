@@ -7,14 +7,17 @@
   function handleActionClick() {
     nav("login");
   }
+
+  function toSignup() {
+    nav("signup");
+  }
   onMount(() => {
     if (DB("get", "login")) {
       nav("home");
     }
-    
   });
 
-  let toggleFullScreen = function(){
+  let toggleFullScreen = function () {
     main.requestFullscreen();
   };
 </script>
@@ -26,13 +29,11 @@
   </div>
   <div class="text">
     <div class="button">
-      <button class="btn" on:click={handleActionClick}
-        >Sign up to suplike</button
-      >
+      <button class="sup_btn" on:click={toSignup}>Sign up to suplike</button>
     </div>
 
     <div class="button">
-      <button class="btn self">select your own server</button>
+      <button class="sup_btn self">select your own server</button>
     </div>
   </div>
   <div class="container">
@@ -97,7 +98,7 @@
     height: auto;
     margin-top: 0.5em;
   }
-  button.btn {
+  :global(.sup_btn) {
     background-color: var(--color-primary);
     color: var(--color-light);
     border: none;
@@ -109,7 +110,7 @@
     cursor: pointer;
     transition: 0.2s all;
   }
-  button.btn:hover:not(.self) {
+  :global(.sup_btn:hover:not(.self)) {
     background-color: var(--color-light);
     color: var(--color-primary);
     outline: 2px solid var(--color-primary);

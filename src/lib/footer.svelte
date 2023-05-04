@@ -36,14 +36,14 @@
       <i class="fas fa-search" />
       <span>Search</span>
     </a>
-    <a
+    <!-- <a
       class:selected={activePage === "post"}
       href="#"
       on:click|preventDefault={() => setActivePage("post", 8)}
     >
       <i class="fas fa-plus" />
       <span>post</span>
-    </a>
+    </a> -->
     <a
       class:selected={activePage === "notifications"}
       href="#"
