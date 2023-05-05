@@ -11,7 +11,6 @@
     email: "",
   };
   let title = "login to account";
-  let type = "login";
 
   async function login(userData) {
     if (DB("get", "login", "username") === userData.name) {
@@ -65,7 +64,7 @@
   function validate(type) {}
 </script>
 
-<Header {title} />
+<Header {title} backTo="intro"/>
 <main>
   <div class="form">
     <input
@@ -128,7 +127,6 @@
   }
 
   .sup_btn {
-    background-color: var(--primary-color);
     width: 80%;
     border-radius: calc(var(--spacing-large) / 2);
   }

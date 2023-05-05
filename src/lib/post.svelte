@@ -34,6 +34,7 @@
       type,
     }).then((response) => {
       msg = response.data.msg;
+      textContent = "";
     });
     // Reset text content field
   };
@@ -46,9 +47,9 @@
       type,
       content:textContent,
     }).then((response) => {
-      console.log("🚀 ~ file: post.svelte:51 ~ awaitmakeRequest ~ response:", response)
       if (response.data.msg) {
         msg = response.data.msg;
+        textContent = "";
       }
     });
   };

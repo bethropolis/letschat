@@ -72,6 +72,7 @@
   }
 
   function switchAccount() {
+    LogOut();
     nav("login");
   }
   async function followUser() {

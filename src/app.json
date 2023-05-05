@@ -1,13 +1,20 @@
 {
-    "name": "suplike",
-    "description": "",
-    "version": "1.0.0",
-    "version_no": 1,
-    "image": "",
-    "tags": [],
-    "base_url": "http://192.168.9.101/suplike",
-    "api_key": "b2f4cb3083ca8588a5a6ca1dbd97e1f5947fefac3ecd76ff10b98400f1e3e7b0",
-    "api_secret": "",
-    "github": "",
-    "website": ""
+  "name": "suplike",
+  "description": "",
+  "version": "1.0.0",
+  "version_no": 1,
+  "image": "",
+  "tags": [],
+  "base_url": "http://192.168.9.101/suplike",
+  "api_key": "b2f4cb3083ca8588a5a6ca1dbd97e1f5947fefac3ecd76ff10b98400f1e3e7b0",
+  "api_secret": "",
+  "github": "",
+  "website": "",
+  "guide_lines": [
+    "We kindly ask you to be respectful and civil to other users. Please refrain from harassing, bullying, threatening, or abusing anyone.",
+    "We appreciate your mindfulness of the server’s resources and limitations. Please avoid posting or sharing excessively large files or abusing the server’s features or functions.",
+    "We welcome your feedback and suggestions :)",
+    "Have fun and enjoy!"
+  ]
+
 }

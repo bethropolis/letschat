@@ -4,6 +4,7 @@
   import { DB } from "../../db";
   import VideoPlayer from "./videoPlayer.svelte";
   import MusicPlayer from "./musicPlayer.svelte";
+  import Lightbox from "./lightbox.svelte";
 
   let messages = [];
   let start = 1;
@@ -17,6 +18,7 @@
   let reciever_avatar = "";
   const emojiRegex = /[\uD800-\uDFFF]/;
   let y;
+  let lightbox;
   async function updateChatWith() {
     chatwith = (await users.find((user) => user.username === username)) || {};
     console.log(
@@ -56,11 +58,6 @@
       text = renderEmoji(text);
     }
 
-    if (text.includes("\n")) {
-      // Add line breaks if there are "\n" characters in the text
-      text = addBreaks(text);
-    }
-
     // Check for code blocks enclosed in triple backticks
     const codeRegex = /```([\s\S]*)```/;
     if (codeRegex.test(text)) {
@@ -69,6 +66,11 @@
         return renderCode(p1);
       });
     }
+    if (text.includes("\n")) {
+      // Add line breaks if there are "\n" characters in the text
+      text = addBreaks(text);
+    }
+
     // Add other checks for additional text formatting functions here
     return text;
   }
@@ -81,7 +83,7 @@
     return text;
   }
 
-  function addBreaks(text, separator = "\n") {
+  function addBreaks(text, separator = "r\n") {
     // Replace separator with line breaks
     return text.replace(new RegExp(separator, "g"), "<br>");
   }
@@ -107,6 +109,7 @@
 
 <svelte:window bind:scrollY={y} />
 <main>
+  <Lightbox bind:this={lightbox} />
   <div class="chat-box">
     {#each messages as message}
       <div
@@ -123,7 +126,7 @@
 
           <div class="content">
             {#if message.type === "image" || message.type === "img"}
-              <img src={message.content} alt="shot" class="image" />
+              <img src={message.content} alt="shot" class="image" on:click={()=>{lightbox.openLightbox(message.content)}} />
             {:else if message.type === "txt"}
               <div class="text">{@html renderText(message.content)}</div>
             {:else if message.type === "vid"}

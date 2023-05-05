@@ -1,4 +1,5 @@
 <script>
+  import { config } from "../store";
   import {
     LogOut,
     getPasswordStrength,
@@ -18,9 +19,12 @@
   };
   let title = "sign up an account";
   let type = "signup";
+  let agree = false;
   let error = "";
   let itemError = "";
   let passStrenght = "strong";
+  let signupInProgress = false;
+
   //   similar to login.svelte
   async function signup(userData) {
     if (!(await validate())) return;
@@ -38,15 +42,16 @@
       password: userData.password,
       email: userData.email,
     };
-
+    signupInProgress = true;
     await makeRequest("signup", "POST", params, headers)
       .then((response) => {
+        signupInProgress = false;
         if (response.data.type !== "error") {
           LogOut();
           DB("set", "login", response.data);
           type = "rules";
-		  title = "server rules";
-		  return
+          title = "server guidelines";
+          return;
         } else {
           error = response.data.msg;
         }
@@ -88,7 +93,7 @@
 <main>
   {#if type === "signup"}
     <div class="form">
-      <input type="text" bind:value={userData.name} placeholder="name..." />
+      <input type="text" bind:value={userData.name} title="optional" placeholder="your name(s)..." />
       <input
         type="text"
         bind:value={userData.username}
@@ -121,13 +126,17 @@
         class="sup_btn"
         on:click={async () => await signup(userData)}
         disabled={error !== "" ||
-          userData.name === "" ||
           userData.username === "" ||
           userData.email === "" ||
           userData.password === ""}
       >
-        Signup</button
-      >
+        {#if signupInProgress}
+          <i class="fas fa-spinner fa-spin" />
+          signing up...
+        {:else}
+          Signup
+        {/if}
+      </button>
     </div>
     <div class="container">
       <span class="line" />
@@ -149,29 +158,31 @@
     </div>
   {:else if type === "rules"}
     <div class="rules">
+      <!-- ul > li > p -->
       <ul>
-        <li>
-          <p>
-            spam and trolls are not allowed and anyone going who violates these
-            rules will be banned.
-          </p>
-        </li>
-        <li>
-          <p>
-            hate speech and NSFW content are not allowed and anyone going who
-            violates these rules will be banned.
-          </p>
-        </li>
+        {#each $config["guide_lines"] as guide}
+          <li>
+            <p>
+              {guide}
+            </p>
+          </li>
+        {/each}
       </ul>
 
       <div class="accept_btn">
+        <!-- a nice lable for hiden check box (well for styling).  -->
+        <div class="checkbox">
+          <input type="checkbox" id="agree" bind:checked={agree} />
+          <label for="agree">I have read and agree to the rules</label>
+        </div>
         <button
           class="sup_btn"
           on:click|preventDefault={() => {
             nav("home");
           }}
+          disabled={!agree}
         >
-          I agree
+          continue
         </button>
       </div>
     </div>
@@ -200,12 +211,11 @@
   }
 
   .sup_btn {
-    background-color: var(--primary-color);
     width: 80%;
     border-radius: calc(var(--spacing-large) / 2);
   }
 
-  input {
+  input:not([type="checkbox"]) {
     margin-bottom: 1em;
     font-family: "Roboto", sans-serif;
     font-size: 18px;
@@ -219,15 +229,43 @@
   }
 
   input:focus {
-    /* Change the border color to a darker gray */
     border-color: var(--primary-color);
-    /* Add a subtle box shadow */
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   input::placeholder {
-    /* Use a lighter font color for the placeholder text */
     color: #aaa;
+  }
+
+  input[type="checkbox"] {
+    cursor: pointer;
+    appearance: none;
+    border: 1px solid var(--color-primary);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    transition: all 0.3s ease-in-out;
+  }
+
+  input[type="checkbox"]:after {
+    content: "";
+    position: relative;
+    left: 40%;
+    top: 20%;
+    width: 15%;
+    height: 40%;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(50deg);
+    display: none;
+  }
+
+  input[type="checkbox"]:checked {
+    background: var(--color-primary);
+  }
+
+  input[type="checkbox"]:checked:after {
+    display: block;
   }
 
   button:disabled,
@@ -266,12 +304,14 @@
     width: 95%;
     margin: 0 auto;
   }
+
   .item {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
   }
+
   .item a {
     text-decoration: none;
     color: var(--mauve);
@@ -279,6 +319,7 @@
     margin: 0 10px;
     transition: 0.2s all;
   }
+
   .item a:hover {
     color: var(--color-primary);
     opacity: 0.8;
@@ -287,63 +328,71 @@
   .red-err {
     border: 2px solid red;
   }
+
   .form div {
     width: 90%;
     margin: 0 auto 15px;
     text-align: center;
     transition: opacity 0.3s ease-in-out;
   }
+
   #error {
     color: red;
-    /* Use a transition for the opacity */
   }
 
-  #error.show {
-    /* Show the error message with full opacity */
-    opacity: 1;
-  }
-
-  #error.hide {
-    /* Hide the error message with zero opacity */
-    opacity: 0;
-  }
-
-  /* RULES CSS */
   .rules {
     margin-top: 3em;
     height: auto;
     width: 100%;
     text-align: left;
   }
+
   .rules ul {
     list-style-type: none;
     margin: 0;
-	padding: 0;
+    padding: 0;
   }
+
   .rules li {
-	padding: 8px;
-    font-size: 18px;
+    padding: 8px;
+    font-size: 20px;
     line-height: 1.2;
-	border-bottom: 1px solid var(--color-line);
+    border-bottom: 1px solid var(--color-line);
   }
+
   .rules li:last-child {
-	border-bottom: none;
+    border-bottom: none;
   }
+
   .rules li p {
-	margin: 0;
-	padding: 0;
-	font-size: 16px;
-	line-height: 1.2;
-	margin-bottom: 1em;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1.2;
+    margin-bottom: 1em;
   }
+
   .rules .accept_btn {
-	position: absolute;
-	bottom: 50px;
-	margin-top: 1em;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: auto;
-	width: 100%;
+    position: absolute;
+    bottom: 50px;
+    margin-top: 1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    width: 100%;
+  }
+
+  .rules .checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1em;
+  }
+
+  .rules .checkbox label {
+    font: 18px "Roboto", sans-serif;
+    color: var(--color-text);
   }
 </style>

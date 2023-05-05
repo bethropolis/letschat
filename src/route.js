@@ -1,13 +1,16 @@
-import { navigate} from "svelte-routing";
+import { navigate } from "svelte-routing";
 
 export function nav(location = "", params = null) {
- 
+  if (location == "intro") {
+    return navigate("/");
+  }
+
   // Construct the path to the route using the location and parameters
-  const path = "/"+location + (params ? "?" + new URLSearchParams(params) : "");
-  console.log("🚀 ~ file: route.js:7 ~ nav ~ path:", path)
+  const path =
+    "/" + location + (params ? "?" + new URLSearchParams(params) : "");
 
   // Use the navigate function from svelte-routing to navigate to the path
-  navigate(path  );
+  navigate(path);
 }
 
 // redirect to login page if not logged in
@@ -28,8 +31,8 @@ export function isCurrentPage(location, param = null) {
   // check if the current route has a parameter
   if (param) {
     let url = new URLSearchParams(window.location.search);
-    if (!url.has(param))  return
-      return true
+    if (!url.has(param)) return;
+    return true;
   }
   return true;
 }
@@ -42,5 +45,3 @@ export function checkParams(param = null) {
     return urlParams.get(param);
   }
 }
-
-

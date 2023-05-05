@@ -18,6 +18,7 @@ import Notification from "./lib/notification.svelte";
 import Comment from "./lib/comment.svelte";
 import StoriesBox from "./lib/ui/storiesBox.svelte";
 import Signup from "./lib/signup.svelte";
+  import SinglePost from "./lib/singlePost.svelte";
 </script>
 
 <main>
@@ -37,6 +38,7 @@ import Signup from "./lib/signup.svelte";
         <Route path="/notification" component={Notification} />
         <Route path="/comment/:post" component={Comment} />
         <Route path="/stories" component={StoriesBox} />
+        <Route path="/post/:id" component={SinglePost} />
     </Router>
 </main>
 
@@ -75,7 +77,6 @@ import Signup from "./lib/signup.svelte";
     --orchid: #da70d6;
     --magenta: #ff00ff;
     --fuchsia: #ff00ff;
-    --indigo: #4b0082;
     --spacing-small: 1rem;
     --spacing-medium: 2rem;
     --spacing-large: 3rem;

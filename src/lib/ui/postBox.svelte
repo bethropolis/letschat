@@ -5,10 +5,10 @@
   import { createEventDispatcher } from "svelte";
   import { nav } from "../../route";
   import config from "../../app.json";
-  import Snackbar from "./snackbar.svelte";
   import { DB } from "../../db";
   import VideoPlayer from "./videoPlayer.svelte";
   import MusicPlayer from "./musicPlayer.svelte";
+  import { snack } from "../../snack";
 
   let src;
   let lightbox;
@@ -43,17 +43,26 @@
 
   async function repostPost() {
     post.reposted = !post.reposted;
-    const { data } = await makeRequest("repost", "POST", {
+    await makeRequest("repost", "POST", {
       user_token,
       post_id: post.post_id,
-    });
-    let snackbar = new Snackbar({
-      target: document.body,
-      props: {
-        msg: data.msg,
-        visible: true,
-      },
-    });
+    }).then((response) => {
+        snack(response.data.msg);
+      }
+    );
+    
+  }
+
+  async function reportPost(){
+     await makeRequest("report", "POST", {
+      user_token,
+      id: post.id,
+    }).then((response) => {
+      snack(response.data.msg);
+    })
+  }
+  async function sharePost(){
+    dispatch("share");
   }
 
   function goToComments() {
@@ -132,8 +141,9 @@
           {#if post.user.name == username}
             <li>Delete</li>
           {/if}
-          <li>Report</li>
-          <li>Share</li>
+          <li on:click={()=>{nav(`post/${post.post_id}`)}}>View</li>
+          <li on:click={reportPost}>Report</li>
+          <li on:click={sharePost}>Share</li>
           <li>Embed</li>
         </ul>
       </div>
@@ -181,7 +191,7 @@
           <i class="fas fa-retweet post-action-icon" />
         </button>
         <button class="post-action-button">
-          <i class="fas fa-share post-action-icon" />
+          <i class="fas fa-share post-action-icon" on:click={sharePost} />
         </button>
       </div>
     </footer>

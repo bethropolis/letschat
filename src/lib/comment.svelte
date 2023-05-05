@@ -123,12 +123,6 @@
           <div class="actions">
             <button
               on:click={() => {
-                comment.likes++;
-                comment.liked = !comment.liked;
-              }}><i class="fa fa-thumbs-up" />{comment.likes || 0}</button
-            >
-            <button
-              on:click={() => {
                 replyId = comment.id;
                 addReply(`@${comment.username}`);
                 toggleModal(false);
@@ -150,13 +144,6 @@
                     <p>{reply.comment}</p>
                     <small>{formatTime(reply.date)}</small>
                     <div class="actions">
-                      <button
-                        on:click={() => {
-                          reply.likes++;
-                          reply.liked = !reply.liked;
-                        }}
-                        ><i class="fa fa-thumbs-up" />{reply.likes || 0}</button
-                      >
                       <button
                         on:click={() => {
                           replyId = comment.id;
@@ -315,6 +302,8 @@
   }
   .actions {
     display: flex;
+    width: 100%;
+    justify-content: end;
   }
   .actions button {
     display: flex;
@@ -344,7 +333,6 @@
     color: var(--color-gray);
     font-size: 0.8rem;
   }
-
   .hidden {
     display: none;
   }

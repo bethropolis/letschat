@@ -126,7 +126,7 @@
     left: 0;
     right: 0;
     background-color: var(--color-post);
-    padding: 10px 30px 30px;
+    padding: 10px 10px 30px;
     border-radius: 24px 24px 0 0;
     transition: transform 0.5s ease-out;
     transform: translateY(100%);
