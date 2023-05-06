@@ -4,12 +4,11 @@
   import { nav } from "../route";
   import { DB } from "../db";
   let main;
-  function handleActionClick() {
-    nav("login");
-  }
-
   function toSignup() {
     nav("signup");
+  }
+  function toLogin() {
+    nav("login");
   }
   onMount(() => {
     if (DB("get", "login")) {
@@ -17,9 +16,6 @@
     }
   });
 
-  let toggleFullScreen = function () {
-    main.requestFullscreen();
-  };
 </script>
 
 <main bind:this={main}>
@@ -46,7 +42,7 @@
       <a href="http://">Github</a>
     </div>
     <div class="item">
-      <a href="#" on:click={toggleFullScreen}>Log in</a>
+      <a href="#" on:click={toLogin}>Log in</a>
     </div>
   </div>
 </main>

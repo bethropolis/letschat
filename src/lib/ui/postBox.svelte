@@ -22,10 +22,10 @@
       post_id: post.id,
     }).then((response) => {
       if (response.data.type === "success") {
-        if(response.data.msg === "Liked"){
+        if (response.data.msg === "Liked") {
           post.liked = true;
           post.post_likes++;
-        }else{
+        } else {
           post.liked = false;
           post.post_likes--;
         }
@@ -47,21 +47,19 @@
       user_token,
       post_id: post.post_id,
     }).then((response) => {
-        snack(response.data.msg);
-      }
-    );
-    
+      snack(response.data.msg);
+    });
   }
 
-  async function reportPost(){
-     await makeRequest("report", "POST", {
+  async function reportPost() {
+    await makeRequest("report", "POST", {
       user_token,
       id: post.id,
     }).then((response) => {
       snack(response.data.msg);
-    })
+    });
   }
-  async function sharePost(){
+  async function sharePost() {
     dispatch("share");
   }
 
@@ -141,10 +139,26 @@
           {#if post.user.name == username}
             <li>Delete</li>
           {/if}
-          <li on:click={()=>{nav(`post/${post.post_id}`)}}>View</li>
-          <li on:click={reportPost}>Report</li>
-          <li on:click={sharePost}>Share</li>
-          <li>Embed</li>
+          <li
+            on:click={() => {
+              nav(`post/${post.post_id}`);
+            }}
+          >
+            <i class="fas fa-eye" />
+            <span>View</span>
+          </li>
+          <li on:click={reportPost}>
+            <i class="fas fa-flag" />
+            <span>Report</span>
+          </li>
+          <li on:click={sharePost}>
+            <i class="fas fa-share" />
+            <span>Share</span>
+          </li>
+          <li>
+            <i class="fas fa-bookmark" />
+            <span>Save</span>
+          </li>
         </ul>
       </div>
     </header>
@@ -155,7 +169,8 @@
           alt={post.image_text}
           class="post-image"
           on:click={() => {
-            showLightbox(`${config.base_url}/img/${post.image}`);
+            let img = `${config.base_url}/img/${post.image}`;
+            showLightbox(img);
           }}
         />
       {:else if post.type == "vid"}
@@ -273,7 +288,7 @@
   .dropdown ul li {
     position: relative;
     cursor: pointer;
-    padding: 5px 0;
+    padding: 7px;
   }
 
   .dropdown:hover ul {

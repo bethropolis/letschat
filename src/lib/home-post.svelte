@@ -51,20 +51,25 @@
     const response = await makeRequest("post", "GET", {
       user_token: userToken,
       last_id: lastPostId,
+    }).then((response) => {
+      if(response.data.length > 0) {
+        return response.data
+      }
+      return [];
     });
 
     // Update posts and hasMorePosts
-    if (response.data.length === 0) {
+    if (response.length === 0) {
       scrollInfo = "No more posts";
     }
-    posts = [...storedData.data, ...response.data];
+    posts = [...storedData.data, ...response];
     DB(
       "update",
       "homePost",
       JSON.stringify({ data: posts, timestamp: Date.now() })
     );
     isLoading = false;
-    hasMorePosts = response.data.length > 0;
+    hasMorePosts = response.length > 0;
   };
 
   // Load more button clicked function
@@ -112,8 +117,14 @@
   const shareLinkOrText = async (text, url) => {
     const title = $config.name;
     if (navigator.share) {
+      let shareData = {
+        title,
+        text,
+        url
+      }
+        console.log("🚀 ~ file: home-post.svelte:116 ~ shareLinkOrText ~ shareData:", shareData)
       try {
-        await navigator.share({ title, text, url });
+        await navigator.share(shareData);
       } catch (err) {
         snack("can't share");
       }
@@ -182,7 +193,13 @@
         {/if}
       </div>
       <div class="modal-content-footer">
-        <button title="share link">
+        <button title="share link"
+        on:click={(elem) => {
+          let url = $config.base_url + "/post/" + postToShare.post_id;
+          let text =  postToShare.image_text;
+          shareLinkOrText(text, url);
+        }}
+        >
           <i class="fas fa-share-alt" />
           <span>share</span>
         </button>

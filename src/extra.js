@@ -46,12 +46,15 @@ export function convertDateToTime(dateString) {
 
 // logout
 export const LogOut = function () {
-  let loggedInUser = DB("get", "login") || null; // assuming you store the logged-in user info in "user" key
+  if(!DB("get", "login") )return;
+  let loggedInUser = DB("get", "login"); // assuming you store the logged-in user info in "user" key
+  let filteredUsers = [];
+  if(DB("get", "extAcc")){
   let existingAcc = DB("get", "extAcc");
-
-  let filteredUsers = existingAcc.users.filter(
+   filteredUsers = existingAcc.users.filter(
     (user) => user.username !== loggedInUser.username
   );
+  }
   DB("clear");
   DB("set", "extAcc", { users: filteredUsers });
 };

@@ -1,5 +1,5 @@
 <script>
-  import { config } from "../store";
+  import { config, login_token } from "../store";
   import {
     LogOut,
     getPasswordStrength,
@@ -8,6 +8,7 @@
   } from "../extra.js";
   import { makeRequest } from "../api.js";
   import { DB } from "../db.js";
+  import mail from "../assets/mail.png";
   import { nav } from "../route.js";
   import { snack } from "../snack.js";
   import Header from "./header.svelte";
@@ -46,18 +47,22 @@
     await makeRequest("signup", "POST", params, headers)
       .then((response) => {
         signupInProgress = false;
-        if (response.data.type !== "error") {
+        if (response.data.type == "success") {
           LogOut();
           DB("set", "login", response.data);
+          DB("set", "token", response.data.user_token);
+          DB("update", "extAcc", JSON.stringify({ users: response.data }));
+          $login_token = response.data.user_token;
           type = "rules";
           title = "server guidelines";
+
           return;
         } else {
           error = response.data.msg;
         }
       })
       .catch((error) => {
-        snack(error.response.data.msg);
+        error = "something went wrong, contact support";
       });
   }
   function validate() {
@@ -89,11 +94,16 @@
   $: userData && clearError();
 </script>
 
-<Header {title} />
-<main>
+<main class:bg={type == "email_sent"}>
+  <Header {title} disableBack={type == "email_sent"} />
   {#if type === "signup"}
     <div class="form">
-      <input type="text" bind:value={userData.name} title="optional" placeholder="your name(s)..." />
+      <input
+        type="text"
+        bind:value={userData.name}
+        title="optional"
+        placeholder="your name(s)..."
+      />
       <input
         type="text"
         bind:value={userData.username}
@@ -178,12 +188,31 @@
         <button
           class="sup_btn"
           on:click|preventDefault={() => {
-            nav("home");
+            title = "";
+            type = "email_sent";
           }}
           disabled={!agree}
         >
           continue
         </button>
+      </div>
+    </div>
+  {:else if (type = "email_sent")}
+    <div class="mail">
+      <div class="topInfo">
+        <h1>Email sent!</h1>
+        <p>We have sent you an email to verify your account.</p>
+      </div>
+      <div class="imgContainer">
+        <img alt="mail sent" src={mail} />
+      </div>
+      <div class="accept_btn">
+        <button
+          class="sup_btn"
+          on:click={() => {
+            nav("home");
+          }}>continue</button
+        >
       </div>
     </div>
   {/if}
@@ -195,7 +224,7 @@
 	} */
   main {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     text-align: center;
   }
 
@@ -372,7 +401,7 @@
     margin-bottom: 1em;
   }
 
-  .rules .accept_btn {
+  .accept_btn {
     position: absolute;
     bottom: 50px;
     margin-top: 1em;
@@ -394,5 +423,50 @@
   .rules .checkbox label {
     font: 18px "Roboto", sans-serif;
     color: var(--color-text);
+  }
+
+  /* email  */
+  .bg {
+    background: #a89ef5;
+  }
+  .mail {
+    width: 100%;
+    color: var(--color-lighter);
+  }
+  .mail .topInfo {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 2em;
+  }
+  .mail .topInfo h1 {
+    font-size: 2em;
+    margin-bottom: 1em;
+    color: var(--color-lighter);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 400;
+    font-family: "Roboto", sans-serif;
+    line-height: 1.2;
+  }
+  .mail .topInfo p {
+    font-size: 1.2em;
+    color: var(--color-lighter);
+    font-family: "Roboto", sans-serif;
+    line-height: 1.2;
+  }
+  .mail .imgContainer {
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .imgContainer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 </style>

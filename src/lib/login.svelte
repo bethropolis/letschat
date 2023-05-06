@@ -70,7 +70,7 @@
     <input
       type="text"
       bind:value={userData.name}
-      placeholder="username..."
+      placeholder="username or mail..."
       id="f_mail"
     />
     <input

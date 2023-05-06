@@ -129,7 +129,7 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 1.5vh;
-    background-color: var(--color-light);
+    background-color: transparent;
     z-index: 100;
   }
   .header {
