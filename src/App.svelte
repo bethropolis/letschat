@@ -1,56 +1,53 @@
 <script>
-// @ts-nocheck
+  // @ts-nocheck
 
-import {
-    Router,
-    Route
-} from "svelte-routing";
-import Intro from "./lib/intro.svelte";
-import Login from "./lib/login.svelte";
-import Home from "./lib/home.svelte";
-import Profile from "./lib/profile.svelte";
-import Settings from "./lib/settings.svelte";
-import Chat from "./lib/chat.svelte";
-import Post from "./lib/post.svelte";
-import Search from "./lib/search.svelte";
-import Following from "./lib/following.svelte";
-import Notification from "./lib/notification.svelte";
-import Comment from "./lib/comment.svelte";
-import StoriesBox from "./lib/ui/storiesBox.svelte";
-import Signup from "./lib/signup.svelte";
+  import { Router, Route } from "svelte-routing";
+  import Intro from "./lib/intro.svelte";
+  import Login from "./lib/login.svelte";
+  import Home from "./lib/home.svelte";
+  import Profile from "./lib/profile.svelte";
+  import Settings from "./lib/settings.svelte";
+  import Chat from "./lib/chat.svelte";
+  import Post from "./lib/post.svelte";
+  import Search from "./lib/search.svelte";
+  import Following from "./lib/following.svelte";
+  import Notification from "./lib/notification.svelte";
+  import Comment from "./lib/comment.svelte";
+  import StoriesBox from "./lib/ui/storiesBox.svelte";
+  import Signup from "./lib/signup.svelte";
   import SinglePost from "./lib/singlePost.svelte";
 </script>
 
 <main>
-    <Router>
-        <Route path="/" component={Intro} />
-        <Route path="/login" component={Login} />
-        <Route path ="/signup" component={Signup} />
-        <Route path="/home" component={Home} />
-        <Route path="/profile" component={Profile} />
-        <Route path="/profile/:username" component={Profile} />
-        <Route path="/settings" component={Settings} />
-        <Route path="/chat" component={Chat} />
-        <Route path="/chat/:username" component={Chat} let:params />
-        <Route path="/post" component={Post} />
-        <Route path="/search" component={Search} />
-        <Route path="/following" component={Following} />
-        <Route path="/notification" component={Notification} />
-        <Route path="/comment/:post" component={Comment} />
-        <Route path="/stories" component={StoriesBox} />
-        <Route path="/post/:id" component={SinglePost} />
-    </Router>
+  <Router>
+    <Route path="/" component={Intro} />
+    <Route path="/login" component={Login} />
+    <Route path="/signup" component={Signup} />
+    <Route path="/home" component={Home} />
+    <Route path="/profile" component={Profile} />
+    <Route path="/profile/:username" component={Profile} />
+    <Route path="/settings" component={Settings} />
+    <Route path="/chat" component={Chat} />
+    <Route path="/chat/:username" component={Chat} let:params />
+    <Route path="/post" component={Post} />
+    <Route path="/search" component={Search} />
+    <Route path="/following" component={Following} />
+    <Route path="/notification" component={Notification} />
+    <Route path="/comment/:post" component={Comment} />
+    <Route path="/stories" component={StoriesBox} />
+    <Route path="/post/:id" component={SinglePost} />
+  </Router>
 </main>
 
 <style>
-@font-face {
+  @font-face {
     font-family: "Roboto";
     src: url("assets/roboto/Roboto-Regular.ttf") format("truetype");
     font-weight: 400;
     font-style: regular;
-}
+  }
 
-:global(:root) {
+  :global(:root) {
     --color-primary: #6c5ce7;
     --color-primary-dark: rgba(159, 165, 241, 0.945);
     --color-accent: rgba(50, 159, 192, 0.844);
@@ -81,19 +78,19 @@ import Signup from "./lib/signup.svelte";
     --spacing-medium: 2rem;
     --spacing-large: 3rem;
     --font: "Roboto", sans-serif;
-}
+  }
 
-:global(body, main) {
+  :global(body, main) {
     background-color: var(--color-light);
     color: var(--color-dark);
     font-family: var(--font);
-}
+  }
 
-:global(*:focus) {
+  :global(*:focus) {
     outline: none;
-}
+  }
 
-:global(*) {
+  :global(*) {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
+  }
 </style>
