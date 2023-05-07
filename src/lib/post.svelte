@@ -5,6 +5,7 @@
   import { makeRequest } from "../api";
   import { login_token } from "../store";
   import MusicPlayer from "./ui/musicPlayer.svelte";
+  import { checkFileExtension } from "../extra";
   let activeTab = "text";
   let textContent = "";
   let user_token = $login_token;
@@ -58,7 +59,7 @@
     file = event.target.files[0];
     fileName = file.name;
     createFilePreview();
-    checkFileExtension();
+    type = checkFileExtension(fileName);
   }
 
   function createFilePreview() {
@@ -69,24 +70,6 @@
     reader.readAsDataURL(file);
   }
 
-  function checkFileExtension() {
-    const imageExtensions = ["jpg", "jpeg", "png", "gif"];
-    const videoExtensions = ["mp4", "avi", "mov", "wmv"];
-    const audioExtensions = ["mp3", "wav", "ogg", "aac"];
-    const extension = fileName.split(".").pop().toLowerCase();
-    if (imageExtensions.includes(extension)) {
-      console.log("Image file uploaded");
-      type = "img";
-    } else if (videoExtensions.includes(extension)) {
-      console.log("Video file uploaded");
-      type = "vid";
-    } else if (audioExtensions.includes(extension)) {
-      console.log("Audio file uploaded");
-      type = "mus";
-    } else {
-      console.log("Other file uploaded");
-    }
-  }
 
   const handleSubmit = async () => {
     msg = `Submiting  &nbsp<i class="fa fa-spin fa-hourglass-1"></i>`;

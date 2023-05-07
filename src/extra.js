@@ -45,19 +45,31 @@ export function convertDateToTime(dateString) {
 }
 
 // logout
-export const LogOut = function () {
-  if(!DB("get", "login") )return;
-  let loggedInUser = DB("get", "login"); // assuming you store the logged-in user info in "user" key
-  let filteredUsers = [];
-  if(DB("get", "extAcc")){
-  let existingAcc = DB("get", "extAcc");
-   filteredUsers = existingAcc.users.filter(
-    (user) => user.username !== loggedInUser.username
-  );
+/**
+ * logout the logged-in user and remove it from the list of users
+ */
+export const logout = function () {
+  try {
+    const loggedInUser = DB('get', 'login');
+    if (!loggedInUser) {
+      console.warn('No logged-in user found');
+      return;
+    }
+    const existingAcc = DB('get', 'extAcc');
+    if (!existingAcc) {
+      console.warn('No external account found');
+      return DB('clear');
+    }
+    const filteredUsers = existingAcc.users.filter(
+      (user) => user.username !== loggedInUser.username
+    );
+    DB('clear');
+    DB('set', 'extAcc', { users: filteredUsers });
+  } catch (error) {
+    console.error(`Error occurred while logging out: ${error}`);
   }
-  DB("clear");
-  DB("set", "extAcc", { users: filteredUsers });
 };
+
 
 // Validate a username
 export function isValidUsername(username) {
@@ -106,3 +118,19 @@ export function getPasswordStrength(password) {
     return "Strong";
   }
 }
+
+export function checkFileExtension(name) {
+    const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+    const videoExtensions = ["mp4", "avi", "mov", "wmv"];
+    const audioExtensions = ["mp3", "wav", "ogg", "aac"];
+    const extension = name.split(".").pop().toLowerCase();
+    if (imageExtensions.includes(extension)) {
+      return "img";
+    } else if (videoExtensions.includes(extension)) {
+       return "vid";
+    } else if (audioExtensions.includes(extension)) {
+      return "mus";
+    } else {
+      return "txt";
+    }
+  }

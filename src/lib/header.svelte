@@ -141,6 +141,7 @@
   .locked {
     position: sticky;
     top: 0;
+    background: var(--color-light);
   }
 
   .back-button {

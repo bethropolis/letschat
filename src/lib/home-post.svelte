@@ -6,6 +6,7 @@
   import PostBox from "./ui/postBox.svelte";
   import ModalBottom from "./ui/modalBottom.svelte";
   import { snack } from "../snack.js";
+  import { nav } from "../route.js";
 
   let userToken = $login_token;
   let posts = [];
@@ -16,20 +17,25 @@
   let postToShare = null;
   let loadMoreButton;
 
+  // hiding the floating action button
+  let scrollY = 0;
+  let prevScrollY = 0;
+  let show = true;
+  let threshold = 60; // the scroll threshold in pixels
+
   // close modal
   let info = {
-    icon: "fa-close",//
+    icon: "fa-close", //
     type: "action",
     action: function () {
       modal = false;
-    }
+    },
   };
   // Load more posts function
   const loadMorePosts = async () => {
     if (!hasMorePosts || isLoading) {
       return;
     }
-
 
     isLoading = true;
 
@@ -52,8 +58,8 @@
       user_token: userToken,
       last_id: lastPostId,
     }).then((response) => {
-      if(response.data.length > 0) {
-        return response.data
+      if (response.data.length > 0) {
+        return response.data;
       }
       return [];
     });
@@ -120,9 +126,12 @@
       let shareData = {
         title,
         text,
-        url
-      }
-        console.log("🚀 ~ file: home-post.svelte:116 ~ shareLinkOrText ~ shareData:", shareData)
+        url,
+      };
+      console.log(
+        "🚀 ~ file: home-post.svelte:116 ~ shareLinkOrText ~ shareData:",
+        shareData
+      );
       try {
         await navigator.share(shareData);
       } catch (err) {
@@ -145,8 +154,20 @@
   $: if (posts.length > 0) {
     hasMorePosts = true;
   }
+
+  $: {
+    if (scrollY > prevScrollY) {
+      // scrolling down
+      show = false;
+    } else if (scrollY < prevScrollY - threshold) {
+      // scrolling up more than the threshold
+      show = true;
+    }
+    prevScrollY = scrollY;
+  }
 </script>
 
+<svelte:window bind:scrollY />
 <main>
   {#each posts as post}
     <PostBox
@@ -167,6 +188,10 @@
       </span>
     {/if}
   </div>
+  <button class="float-btn" on:click={() => nav("post")} class:show>
+    <i class="fa fa-plus" />
+  </button>
+
   <ModalBottom bind:isOpen={modal} {info}>
     <div class="modal-content">
       <div class="modal-content-header">
@@ -193,12 +218,13 @@
         {/if}
       </div>
       <div class="modal-content-footer">
-        <button title="share link"
-        on:click={(elem) => {
-          let url = $config.base_url + "/post/" + postToShare.post_id;
-          let text =  postToShare.image_text;
-          shareLinkOrText(text, url);
-        }}
+        <button
+          title="share link"
+          on:click={(elem) => {
+            let url = $config.base_url + "/post/" + postToShare.post_id;
+            let text = postToShare.image_text;
+            shareLinkOrText(text, url);
+          }}
         >
           <i class="fas fa-share-alt" />
           <span>share</span>
@@ -209,10 +235,6 @@
             let text = `${$config.base_url}/post/${postToShare.post_id}`;
             copyTextToClipboard(text);
             let spanElem = elem.currentTarget.querySelector(".copy");
-            console.log(
-              "🚀 ~ file: home-post.svelte:159 ~ this.parentElement:",
-              spanElem
-            );
             spanElem.innerHTML = "Copied!";
           }}
         >
@@ -258,6 +280,35 @@
     to {
       transform: rotate(360deg);
     }
+  }
+  .float-btn {
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    height: 50px;
+    width: 50px;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .float-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .float-btn:active {
+    transform: scale(0.9);
+  }
+  .float-btn.show {
+    display: block;
+  }
+  .float-btn:not(.show) {
+    display: none;
   }
   .modal-content {
     display: flex;

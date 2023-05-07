@@ -10,8 +10,8 @@
   import MusicPlayer from "./musicPlayer.svelte";
   import { snack } from "../../snack";
 
-  let src;
   let lightbox;
+  let dropdown = false;
   const dispatch = createEventDispatcher();
   export let post = {};
   let user_token = $login_token;
@@ -59,6 +59,16 @@
       snack(response.data.msg);
     });
   }
+  async function deletePost() {
+    await makeRequest("post", "POST", {
+      user_token,
+      post_id: post.post_id,
+      delete: true,
+    }).then((response) => {
+      snack(response.data.msg);
+    })
+  }
+
   async function sharePost() {
     dispatch("share");
   }
@@ -133,12 +143,14 @@
           <p class="post-date">{post.date_posted || ""}</p>
         </div>
       </div>
+      <div class="right">
       <div class="dropdown">
-        <button><i class="fa fa-ellipsis" /></button>
+        <button on:click={() => (dropdown = !dropdown)}>
+          <i class="fa fa-ellipsis" />
+        </button>
+        {#if dropdown}
         <ul>
-          {#if post.user.name == username}
-            <li>Delete</li>
-          {/if}
+          
           <li
             on:click={() => {
               nav(`post/${post.post_id}`);
@@ -151,6 +163,16 @@
             <i class="fas fa-flag" />
             <span>Report</span>
           </li>
+          {#if post.user.name == username}
+            <li on:click={(elem)=>{
+              deletePost();
+              let spanElem =elem.currentTarget.querySelector("span");
+              spanElem.innerHTML = "deleted!";
+            }}>
+              <i class="fas fa-trash" />
+              <span>Delete</span>
+            </li>
+          {/if}
           <li on:click={sharePost}>
             <i class="fas fa-share" />
             <span>Share</span>
@@ -160,7 +182,8 @@
             <span>Save</span>
           </li>
         </ul>
-      </div>
+        {/if}
+      </div></div>
     </header>
     <div class="post-body">
       {#if post.type == "img"}
@@ -234,9 +257,9 @@
 
   .post-header img {
     border-radius: 50%;
-    height: 50px;
+    height: 30px;
     margin-right: 15px;
-    width: 50px;
+    width: 30px;
   }
 
   .user-info {
@@ -246,26 +269,28 @@
   }
 
   .user-info h3 {
-    color: #444444;
-    font-size: 18px;
+    color: var(--color-text);
+    font-size: 16px;
     margin-bottom: 5px;
     margin-top: 0;
   }
 
   .user-info p {
     color: #9b9b9b;
-    font-size: 14px;
+    font-size: 12px;
     margin: 0;
   }
 
   .dropdown {
     position: relative;
+    display: inline-block;
+    cursor: pointer;
   }
 
   .dropdown button {
     background-color: transparent;
     border: none;
-    color: #9b9b9b;
+    color: var(--color-icon) !important;
     cursor: pointer;
     font-size: 20px;
   }

@@ -1,45 +1,67 @@
 <script>
-  // similar to posts-search.svelte
   import { DB } from "../db.js";
   import { makeRequest } from "../api.js";
-  import PostBox from "./ui/postBox.svelte";
   import { onMount } from "svelte";
-  let user_token = "16c78b8e0c126b30749f8d93ad9de7479f7decb572";
-  let posts = [];
+  import { nav } from "../route.js";
+  let user_token = DB("get", "token");
+  let tags = [];
   export let query = "quote";
   export let type;
+  let isLoading = false;
 
-  export async function makeSearch() {
-    if (!query) {
+  export async function makeSearch(local = true) {
+    if (!query && local) {
       if (DB("get", "prevTags")) {
-        return (posts = DB("get", "prevTags"));
+        return (tags = DB("get", "prevTags"));
       }
     }
+    isLoading = true;
     const { data } = await makeRequest("search", "GET", {
       user_token,
       query,
       type,
     });
     DB("set", "prevTags", data.data);
-    posts = data.data;
+    tags = data.data;
+    isLoading = false;
   }
 
+  const selectTag = (tag) => {
+    nav(`tags/${tag.name}`);
+  };
+
   onMount(() => {
-    posts = [];
+    tags = [];
     makeSearch();
-  })
+  });
 </script>
 
 <main>
-  {#if posts}
-    {#each posts as post}
-      <PostBox {post} />
-    {/each}
+  {#if tags.length > 0}
+    <div class="tag-list">
+      {#each tags as tag}
+        <div class="tag" on:click={() => selectTag(tag)}>
+          <div class="tag-name">
+            #
+            {tag.name}
+          </div>
+          <div class="tag-count">
+            {tag.count}
+            {tag.count > 1 ? "posts" : "post"}
+          </div>
+        </div>
+      {/each}
+    </div>
+  {:else if isLoading}
+    <p class="loading">
+      <i class="fas fa-spinner fa-spin" />
+      Loading...
+    </p>
   {:else}
     <div class="alert">
-      <!-- a big icon to tell user should search something -->
+      <!-- a big icon to tell tag should search something -->
       <i class="fas fa-search" />
-      <p>No posts found by tag</p>
+      <p>No tags found</p>
     </div>
   {/if}
 </main>
@@ -52,6 +74,49 @@
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
-    margin-bottom: 60px;
+    margin-bottom: 70px;
+  }
+
+  .tag-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: 100%;
+    width: 100%;
+  }
+
+  .tag {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .tag:last-child {
+    border-bottom: none;
+  }
+
+  .tag:hover {
+    background-color: #f5f5f5;
+  }
+
+  .tag .tag-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--color-text-dark);
+  }
+  .tag .tag-count {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #aaa;
+  }
+  .loading {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--color-gray);
+    margin-top: 1em;
   }
 </style>

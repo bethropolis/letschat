@@ -90,7 +90,17 @@
                 : chat.username}
             </h3>
             <div class="last-message">
-              <p class="msg ellipsis">{@html chat.msg || "empty chat"}</p>
+              <p class="msg ellipsis">
+                {#if chat.type == "img"}
+                <i class="fas fa-image" />
+                {:else if chat.type == "vid"}
+                <i class="fas fa-video" />
+                {:else if chat.type == "mus"}
+                <i class="fas fa-music" />
+                {:else}
+                {chat.msg || "empty chat"}
+                {/if}
+              </p>
               <div class="time">{formatTime(chat.time)}</div>
             </div>
           </div>

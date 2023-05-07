@@ -255,7 +255,7 @@
   .container {
     position: relative;
     width: 100%;
-    height: auto;
+    height: 100%;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
   }
   main:fullscreen .container {

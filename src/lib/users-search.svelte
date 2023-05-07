@@ -25,7 +25,6 @@
       query,
       type,
     });
-    console.log(data);
     users = data.data;
     DB("set", "popular", data.data);
   }

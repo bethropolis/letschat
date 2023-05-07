@@ -1,11 +1,11 @@
 <script>
-  import Snackbar from "./ui/snackbar.svelte";
   import { makeRequest } from "../api";
   import { onMount } from "svelte";
   import Header from "./header.svelte";
   import ModalBottom from "./ui/modalBottom.svelte";
   import { DB } from "../db";
   import { formatTime } from "../extra";
+  import { snack } from "../snack";
 
   const user_token = DB("get", "token"); // user
   const user_username = DB("get", "login", "username");
@@ -43,7 +43,7 @@
     if (response) {
       getComments(user_token, post);
     } else {
-      snack_msg = "failed to send";
+      snack("failed to send");
     }
   };
 
@@ -88,13 +88,7 @@
     }
   };
 
-  const snackMessage = (msg) => {
-    snack_msg = msg;
-
-    setTimeout(() => {
-      snack_msg = null;
-    }, 500);
-  };
+ 
 </script>
 
 <main>
@@ -130,7 +124,7 @@
             >
             <button
               on:click={() => {
-                snackMessage("reported");
+                snack("reported");
               }}><i class="fas fa-flag" /> Report</button
             >
           </div>
@@ -153,7 +147,7 @@
                       >
                       <button
                         on:click={() => {
-                          snackMessage("reported");
+                          snack("reported");
                         }}><i class="fas fa-flag" /> Report</button
                       >
                     </div>
@@ -183,7 +177,6 @@
       >
     </form>
   </ModalBottom>
-  <Snackbar msg={snack_msg} />
 </main>
 
 <style>

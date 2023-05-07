@@ -1,7 +1,7 @@
 <script>
   import { config, login_token } from "../store";
   import {
-    LogOut,
+    logout,
     getPasswordStrength,
     isValidEmail,
     isValidUsername,
@@ -48,10 +48,10 @@
       .then((response) => {
         signupInProgress = false;
         if (response.data.type == "success") {
-          LogOut();
+          logout();
           DB("set", "login", response.data);
           DB("set", "token", response.data.user_token);
-          DB("update", "extAcc", JSON.stringify({ users: response.data }));
+          DB("set", "extAcc", JSON.stringify({ users: response.data }));
           $login_token = response.data.user_token;
           type = "rules";
           title = "server guidelines";
@@ -210,7 +210,7 @@
         <button
           class="sup_btn"
           on:click={() => {
-            nav("home");
+            nav("follow");
           }}>continue</button
         >
       </div>

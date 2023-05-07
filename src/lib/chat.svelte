@@ -6,14 +6,12 @@
   import Chatbox from "./ui/chatbox.svelte";
   import List from "./list.svelte";
   import { makeRequest } from "../api";
-  import { isCurrentPage } from "../route";
+  import { isCurrentPage, nav } from "../route";
   import { DB } from "../db";
 
 
   export let location;
   let user_token = DB("get", "token");
-  let chatwith;
-  let chat_key;
   let users;
   export let username = "chat";
   async function fetchChatList(user_token) {
@@ -43,7 +41,12 @@
 </script>
 
 <main>
-  <Header title={username} locked={true} />
+  <Header title={username} locked={true} >
+    {#if !isCurrentPage("chat")}
+    <!-- show icon to visit profile page  -->
+    <i class="fas fa-user-circle" on:click={() => nav(`profile/${username}`)} />
+    {/if}
+  </Header>
   {#if isCurrentPage("chat")}
     <List bind:chats={users} />
   {:else}

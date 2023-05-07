@@ -8,7 +8,7 @@
   import { nav } from "../route";
   import { DB } from "../db";
   import { snack } from "../snack";
-  import { LogOut } from "../extra";
+  import { logout } from "../extra";
 
   export let username = {
     title: "my profile",
@@ -21,7 +21,7 @@
     icon: "fa-arrow-right-from-bracket",//
     type: "action",
     action: function () {
-      LogOut();
+      logout();
     }
   };
   let isOpen = false;
@@ -71,8 +71,7 @@
     }, 1000);
   }
 
-  function switchAccount() {
-    LogOut();
+   function switchAccount() {
     nav("login");
   }
   async function followUser() {
@@ -155,7 +154,7 @@
       <div class="modal-content">
         <h2>login with existing account</h2>
         <ul>
-          {#if existingAccounts}
+          {#if existingAccounts.length > 0}
             {#each existingAccounts as account}
               <li on:click={() => selectAccount(account)}>
                 <img src={account.profile_picture} alt={account.full_name} />

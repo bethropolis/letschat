@@ -11,10 +11,11 @@
     email: "",
   };
   let title = "login to account";
+  let loginInProgress = false;
 
   async function login(userData) {
     if (DB("get", "login", "username") === userData.name) {
-      let accept = await snack("You are already loggedin");
+      await snack("You are already loggedin");
       return nav("home");
     }
 
@@ -27,28 +28,22 @@
     };
 
     function updateExtAcc(newData) {
-      const oldData = DB("get", "extAcc")?.users || [];
-      let combinedData = oldData.concat(newData);
+      const oldData = DB("get", "extAcc").users || [];
 
-      if (typeof newData === "object" && !Array.isArray(newData)) {
-        // If newData is an object, we need to check for duplicate usernames
-        const usernames = combinedData.map((user) => user.username);
-        combinedData = combinedData.filter(
-          (user, index) => !usernames.slice(0, index).includes(user.username)
-        );
-      } else {
-        // If newData is an array, we can simply use the spread operator to remove duplicates
-        combinedData = [...new Set(combinedData)];
+      if (!oldData.some((oldItem) => oldItem.username === newData.username)) {
+        const combinedData = [...oldData, newData];
+        DB("update", "extAcc", JSON.stringify({ users: combinedData }));
       }
-
-      DB("update", "extAcc", JSON.stringify({ users: combinedData }));
+      return
     }
 
-    makeRequest("login", "POST", params, headers)
-      .then((response) => {
+    loginInProgress = true;
+    await makeRequest("login", "POST", params, headers)
+      .then(async (response) => {
+        loginInProgress = false;
         if (response.data.username) {
           DB("set", "login", response.data);
-          updateExtAcc([response.data]);
+          updateExtAcc(response.data);
           DB("set", "token", response.data.user_token);
           $login_token = response.data.user_token;
           nav("home");
@@ -60,11 +55,9 @@
         console.error(error);
       });
   }
-
-  function validate(type) {}
 </script>
 
-<Header {title} backTo="intro"/>
+<Header {title} backTo="intro" />
 <main>
   <div class="form">
     <input
@@ -85,8 +78,13 @@
       class="sup_btn"
       on:click={async () => await login(userData)}
     >
-      login</button
-    >
+      {#if loginInProgress}
+        <i class="fas fa-spinner fa-spin" />
+        logging in...
+      {:else}
+        login
+      {/if}
+    </button>
   </div>
   <div class="container">
     <span class="line" />

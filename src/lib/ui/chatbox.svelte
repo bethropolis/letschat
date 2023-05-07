@@ -19,12 +19,9 @@
   const emojiRegex = /[\uD800-\uDFFF]/;
   let y;
   let lightbox;
+  
   async function updateChatWith() {
     chatwith = (await users.find((user) => user.username === username)) || {};
-    console.log(
-      "🚀 ~ file: chatbox.svelte:20 ~ updateChatWith ~ chatwith:",
-      chatwith
-    );
   }
 
   async function getMessages(data) {
@@ -41,10 +38,12 @@
         }));
         messages = [...messages, ...newMessages];
       }
-      start = messages[messages.length - 1].id;
+      if(messages.length > 0){
+      start = messages[messages.length-1].id;
+      }
       setTimeout(
         () => getMessages({ to: data.to, from: data.from, start }),
-        5500
+        4000
       );
     } catch (error) {
       console.error(error);
@@ -154,7 +153,7 @@
   main {
     width: 100%;
     height: auto;
-    margin-bottom: 4.2em;
+    margin-bottom: 5.2em;
   }
 
   .chat-box {
@@ -204,12 +203,19 @@
   .content:has(.image) {
     background-color: transparent !important;
   }
+
   .image {
+    width: 100%;
+    height: auto;
     max-width: 100%;
-    max-height: 200px;
     object-fit: contain;
     border-radius: 10px;
     margin: 10px;
+  }
+  .content img{
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
   }
 
   .text {

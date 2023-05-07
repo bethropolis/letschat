@@ -16,6 +16,8 @@
   import StoriesBox from "./lib/ui/storiesBox.svelte";
   import Signup from "./lib/signup.svelte";
   import SinglePost from "./lib/singlePost.svelte";
+  import Follow from "./lib/follow.svelte";
+  import Tags from "./lib/tags.svelte";
 </script>
 
 <main>
@@ -31,6 +33,8 @@
     <Route path="/chat/:username" component={Chat} let:params />
     <Route path="/post" component={Post} />
     <Route path="/search" component={Search} />
+    <Route path="/tags/:query" component={Tags} />
+    <Route path="/follow" component={Follow} />
     <Route path="/following" component={Following} />
     <Route path="/notification" component={Notification} />
     <Route path="/comment/:post" component={Comment} />
@@ -50,6 +54,7 @@
   :global(:root) {
     --color-primary: #6c5ce7;
     --color-primary-dark: rgba(159, 165, 241, 0.945);
+    --color-primary-lighter: #F4EEFF;
     --color-accent: rgba(50, 159, 192, 0.844);
     --color-accent-dark: rgba(110, 207, 236, 0.863);
     --color-lighter: rgba(255, 255, 255, 0.9);

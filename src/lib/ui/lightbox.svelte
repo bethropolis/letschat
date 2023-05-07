@@ -92,6 +92,7 @@ onDestroy(() => {
 
   .lightbox-image-container img {
     max-width: 600px;
+    max-height: 600px;
     width: 100%;
     height: auto;
   }

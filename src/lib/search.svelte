@@ -8,7 +8,6 @@
   import TagsSearch from "./tags-search.svelte";
 
   export let location;
-  console.log("🚀 ~ file: profile.svelte:11 ~ location:", location);
   let params = {};
   let posts;
   let users;
@@ -19,10 +18,9 @@
   let activetab = "users";
 
   const doSearch = () => {
-    if (search == "") return;
     if (activetab == "posts") posts.makeSearch();
     if (activetab == "users") users.makeSearch();
-    if (activetab == "tags") tags.makeSearch();
+    if (activetab == "tags") tags.makeSearch(false);
   };
 
   onMount(() => {
@@ -53,8 +51,7 @@
 </script>
 
 <main>
-  <Header {title} />
-
+  <Header {title} locked={true} />
   <div class="container">
     <div class="search-bar">
       <form class="search-input" on:submit|preventDefault={doSearch}>
