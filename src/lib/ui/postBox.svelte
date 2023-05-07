@@ -11,6 +11,8 @@
   import { snack } from "../../snack";
 
   let lightbox;
+  let repost = null;
+  export let isRepost = false;
   let dropdown = false;
   const dispatch = createEventDispatcher();
   export let post = {};
@@ -43,12 +45,13 @@
 
   async function repostPost() {
     post.reposted = !post.reposted;
-    await makeRequest("repost", "POST", {
-      user_token,
-      post_id: post.post_id,
-    }).then((response) => {
-      snack(response.data.msg);
-    });
+    nav(`post/r/${post.post_id}`);
+    // await makeRequest("repost", "POST", {
+    //   user_token,
+    //   post_id: post.post_id,
+    // }).then((response) => {
+    //   snack(response.data.msg);
+    // });
   }
 
   async function reportPost() {
@@ -66,7 +69,7 @@
       delete: true,
     }).then((response) => {
       snack(response.data.msg);
-    })
+    });
   }
 
   async function sharePost() {
@@ -79,9 +82,18 @@
   function goToProfile() {
     nav(`profile/${post.user.name}`);
   }
+  if (post.repost && !isRepost) {
+    makeRequest("post", "GET", {
+      user_token,
+      post_id: post.repost,
+    }).then((response) => {
+      repost = response.data[0];
+    });
+  }
 </script>
 
 <main>
+  {#if post.image_text}
   <article class="post">
     <Lightbox bind:this={lightbox}>
       <div class="post-header user-info lightbox-header" slot="header">
@@ -144,74 +156,79 @@
         </div>
       </div>
       <div class="right">
-      <div class="dropdown">
-        <button on:click={() => (dropdown = !dropdown)}>
-          <i class="fa fa-ellipsis" />
-        </button>
-        {#if dropdown}
-        <ul>
-          
-          <li
-            on:click={() => {
-              nav(`post/${post.post_id}`);
-            }}
-          >
-            <i class="fas fa-eye" />
-            <span>View</span>
-          </li>
-          <li on:click={reportPost}>
-            <i class="fas fa-flag" />
-            <span>Report</span>
-          </li>
-          {#if post.user.name == username}
-            <li on:click={(elem)=>{
-              deletePost();
-              let spanElem =elem.currentTarget.querySelector("span");
-              spanElem.innerHTML = "deleted!";
-            }}>
-              <i class="fas fa-trash" />
-              <span>Delete</span>
-            </li>
+        <div class="dropdown">
+          <button on:click={() => (dropdown = !dropdown)}>
+            <i class="fa fa-ellipsis" />
+          </button>
+          {#if dropdown}
+            <ul>
+              <li
+                on:click={() => {
+                  nav(`post/${post.post_id}`);
+                }}
+              >
+                <i class="fas fa-eye" />
+                <span>View</span>
+              </li>
+              <li on:click={reportPost}>
+                <i class="fas fa-flag" />
+                <span>Report</span>
+              </li>
+              {#if post.user.name == username}
+                <li
+                  on:click={(elem) => {
+                    deletePost();
+                    let spanElem = elem.currentTarget.querySelector("span");
+                    spanElem.innerHTML = "deleted!";
+                  }}
+                >
+                  <i class="fas fa-trash" />
+                  <span>Delete</span>
+                </li>
+              {/if}
+              <li on:click={sharePost}>
+                <i class="fas fa-share" />
+                <span>Share</span>
+              </li>
+              <li>
+                <i class="fas fa-bookmark" />
+                <span>Save</span>
+              </li>
+            </ul>
           {/if}
-          <li on:click={sharePost}>
-            <i class="fas fa-share" />
-            <span>Share</span>
-          </li>
-          <li>
-            <i class="fas fa-bookmark" />
-            <span>Save</span>
-          </li>
-        </ul>
-        {/if}
-      </div></div>
+        </div>
+      </div>
     </header>
     <div class="post-body">
-      {#if post.type == "img"}
-        <img
-          src={`${config.base_url}/img/${post.image}`}
-          alt={post.image_text}
-          class="post-image"
-          on:click={() => {
-            let img = `${config.base_url}/img/${post.image}`;
-            showLightbox(img);
-          }}
-        />
-      {:else if post.type == "vid"}
-        <VideoPlayer
-          videoProps={{
-            src: `${config.base_url}/img/${post.image}`,
-            controls: true,
-          }}
-        />
-      {:else if post.type == "mus"}
-        <MusicPlayer
-          musicProps={{
-            src: `${config.base_url}/img/${post.image}`,
-            controls: true,
-          }}
-        />
-      {:else}
-        <p class="post-text">{@html post.image_text}</p>
+        {#if post.type == "img"}
+          <img
+            src={`${config.base_url}/img/${post.image}`}
+            alt={post.image_text}
+            class="post-image"
+            on:click={() => {
+              let img = `${config.base_url}/img/${post.image}`;
+              showLightbox(img);
+            }}
+          />
+        {:else if post.type == "vid"}
+          <VideoPlayer
+            videoProps={{
+              src: `${config.base_url}/img/${post.image}`,
+              controls: true,
+            }}
+          />
+        {:else if post.type == "mus"}
+          <MusicPlayer
+            musicProps={{
+              src: `${config.base_url}/img/${post.image}`,
+              controls: true,
+            }}
+          />
+        {:else}
+          <p class="post-text">{@html post.image_text}</p>
+      {#if repost && !isRepost}
+        <svelte:self post={repost} isRepost={true}/>
+        {/if}
       {/if}
     </div>
     <footer class="post-footer">
@@ -234,6 +251,7 @@
       </div>
     </footer>
   </article>
+  {/if}
 </main>
 
 <!-- markup (zero or more items) goes here -->

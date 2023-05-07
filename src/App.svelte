@@ -32,6 +32,7 @@
     <Route path="/chat" component={Chat} />
     <Route path="/chat/:username" component={Chat} let:params />
     <Route path="/post" component={Post} />
+    <Route path="/post/r/:repost" component={Post} />
     <Route path="/search" component={Search} />
     <Route path="/tags/:query" component={Tags} />
     <Route path="/follow" component={Follow} />

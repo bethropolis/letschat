@@ -25,7 +25,7 @@
     }
   };
   let isOpen = false;
-  export let page;
+  export let page = null;
   const activePage = "profile";
   let profile = null;
   let is_switching = false;

@@ -6,14 +6,22 @@
   import { login_token } from "../store";
   import MusicPlayer from "./ui/musicPlayer.svelte";
   import { checkFileExtension } from "../extra";
+  import PostBox from "./ui/postBox.svelte";
+
+
+  export let repost = null;
+  let post;
+
+
   let activeTab = "text";
   let textContent = "";
   let user_token = $login_token;
+  let isSending;
   let file;
   let fileName;
   let filePreview;
   let type = "txt";
-  let characterLimit = 100;
+  let characterLimit = 200;
   let msg;
   let title = "Post";
   let navOptions = [
@@ -28,14 +36,15 @@
   };
 
   const handleTextSubmit = async () => {
-    console.log("Submitting text content:", textContent);
     await makeRequest("post", "POST", {
       user_token,
       content: textContent,
       type,
+      repost
     }).then((response) => {
       msg = response.data.msg;
       textContent = "";
+      isSending = false;
     });
     // Reset text content field
   };
@@ -51,6 +60,7 @@
       if (response.data.msg) {
         msg = response.data.msg;
         textContent = "";
+        isSending = false;
       }
     });
   };
@@ -72,14 +82,23 @@
 
 
   const handleSubmit = async () => {
-    msg = `Submiting  &nbsp<i class="fa fa-spin fa-hourglass-1"></i>`;
+    isSending = true;
     if (activeTab === "text") {
       await handleTextSubmit();
     } else if (activeTab === "file") {
-      console.log("submitting");
       await handleFileSubmit();
     }
   };
+
+  if(repost){
+    title = "Repost"
+    makeRequest("post", "GET", {
+      user_token,
+      post_id: repost,
+    }).then((response) => {
+      post = response.data[0];
+    });
+  }
 
   $: remainingCharacters = characterLimit - textContent.length;
 </script>
@@ -93,7 +112,7 @@
     >
     <button
       class={activeTab === "file" ? "active" : ""}
-      on:click={() => handleTabClick("file")}>File</button
+      on:click={() => handleTabClick("file")} disabled>File</button
     >
   </div>
 
@@ -149,6 +168,10 @@
         {/if}
       </div>
     {/if}
+
+    {#if repost}
+      <PostBox {post} isRepost={true} />
+    {/if}
     <div class="text-input">
       <textarea
         bind:value={textContent}
@@ -163,7 +186,7 @@
 
   <div class="submit">
     <button on:click={handleSubmit} class="btn"
-      >Submit
+      >{repost ? "Repost" : "Submit"}
       <!-- a loader -->
     </button>
   </div>
@@ -197,6 +220,11 @@
   .tabs button.active {
     border-bottom: 2px solid var(--color-primary);
     color: var(--color-primary);
+  }
+
+  .tabs button:disabled{
+    color: var(--color-text-light);
+    border: none;
   }
 
   .content {

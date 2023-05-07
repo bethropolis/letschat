@@ -31,6 +31,8 @@
       user_token,
       post_id,
     });
+    console.log("🚀 ~ file: comment.svelte:34 ~ getComments ~ response:", response.data.data)
+    
     if (response.data.type === "success") {
       comments = response.data.data || [];
     } else if (comments.length === 0) {

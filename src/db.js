@@ -1,8 +1,7 @@
-import Snackbar from "./lib/ui/snackbar.svelte";
+
 export function DB(type = "", key = "", data = null) {
   const localStorageObj = localStorage;
   let storedData;
-
   if (type === "get") {
     storedData = JSON.parse(localStorageObj.getItem(key) || "false");
     return data ? storedData[data] : storedData;
@@ -33,6 +32,4 @@ export function DB(type = "", key = "", data = null) {
     localStorageObj.clear();
     return;
   }
-
-  console.log("storage error");
 }

@@ -74,7 +74,7 @@
   updateChatWith();
   
 </script>
-<div class="chat-input">
+<div class="chat-input" class:open={isExpanded}>
   {#if file}
   <div class="container">
   <div class="file-container">
@@ -105,6 +105,7 @@
       on:click={() => {
         file = null;
         filePreview = null;
+        type = "txt"
       }}
     />
   </div>
@@ -126,7 +127,7 @@
       <input type="file" id="image-upload" name="image" on:change={handleFileUpload} accept="image/*" hidden />
       <input type="file" id="audio-upload" name="audio" on:change={handleFileUpload}  accept="audio/*" hidden />
       <input type="file" id="file-upload" name="video" on:change={handleFileUpload}  accept="video/*" hidden />
-    </div>
+    </div>                                          
   {/if}
 
   <div class="input-wrapper">
@@ -138,7 +139,7 @@
       placeholder="Type your message here..."
       bind:value={message}
     />
-    <button class="send-button" on:click={sendMessage}>
+    <button class="send-button" on:click={sendMessage} disabled={sendingmsg}>
       <i class="fas fa-paper-plane" />
     </button>
   </div>
@@ -149,12 +150,14 @@
   .chat-input {
     position: fixed;
     display: grid;
-    background-color: var(--lavender);
     height: fit-content;
     border-radius: 30px 30px 0 0;
     width: 100%;
     bottom: 0;
     margin: 0 auto;
+  }
+  .chat-input.open {
+    background-color: var(--lavender);
   }
 
   .input-wrapper {
@@ -165,6 +168,10 @@
     margin: 0 auto;
     background-color: var(--color-input);
     border-radius: 30px;
+  }  
+  .chat-input.open {
+    background-color: var(--lavender);
+    border-radius: 30px 30px 0 0;
   }
 
   .add-attachment {
