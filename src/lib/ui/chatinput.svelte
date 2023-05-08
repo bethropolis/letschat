@@ -110,9 +110,11 @@
     />
   </div>
 
-  <button class="sup_btn" on:click={sendMessage}>
+  <button class="sup_btn" on:click={sendMessage} disabled={sendingmsg||!chatwith}>
     {#if sendingmsg}
    <i class="fa fa-spinner fa-spin" /> sending file...
+  {:else if !chatwith}
+      disabled for this user
   {:else}
    send file <i class="fas fa-paper-plane" />
   {/if}
@@ -136,10 +138,11 @@
     </button>
     <textarea
       class={isExpanded ? "expanded" : ""}
-      placeholder="Type your message here..."
+      placeholder={chatwith ? "Type a message...": "cannot chat with this user"}
       bind:value={message}
+      disabled={!chatwith}
     />
-    <button class="send-button" on:click={sendMessage} disabled={sendingmsg}>
+    <button class="send-button" on:click={sendMessage} disabled={sendingmsg||!chatwith}>
       <i class="fas fa-paper-plane" />
     </button>
   </div>
@@ -215,6 +218,10 @@
   }
   .send-button:active {
     transform: scale(0.9);
+  }
+  .send-button:disabled {
+    cursor: not-allowed;
+    background-color: var(--color-gray);
   }
 
   textarea {

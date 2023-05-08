@@ -30,11 +30,14 @@
     function updateExtAcc(newData) {
       const oldData = DB("get", "extAcc").users || [];
 
+      DB("clear"); // this is to remove prev user's data
+
       if (!oldData.some((oldItem) => oldItem.username === newData.username)) {
         const combinedData = [...oldData, newData];
         DB("update", "extAcc", JSON.stringify({ users: combinedData }));
+        return
       }
-      return
+      return DB("update", "extAcc", JSON.stringify({ users: oldData }));
     }
 
     loginInProgress = true;
@@ -42,8 +45,8 @@
       .then(async (response) => {
         loginInProgress = false;
         if (response.data.username) {
-          DB("set", "login", response.data);
           updateExtAcc(response.data);
+          DB("set", "login", response.data);
           DB("set", "token", response.data.user_token);
           $login_token = response.data.user_token;
           nav("home");
@@ -57,7 +60,7 @@
   }
 </script>
 
-<Header {title} backTo="intro" />
+<Header {title} to={"intro"} />
 <main>
   <div class="form">
     <input

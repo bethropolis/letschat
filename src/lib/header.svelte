@@ -7,18 +7,18 @@
   import { snack } from "../snack";
   export let navOptions = [];
   export let title = "" || null;
-  export let backTo = "";
-  export let locked = false;
+  export let to = "";
+  export let locked = true;
   export let disableBack = false;
   let backButtonVisible = false;
 
   // Define a variable to store the timer
   let timer;
 
-  function handleBackButtonClick(to) {
+  function handleBackButtonClick() {
     // handle back button click here
 
-    if (to !== "") {
+    if (to != "") {
       nav(to);
     }
 
@@ -67,14 +67,14 @@
     {#if backButtonVisible && !disableBack}
       <button
         class="back-button"
-        on:click={() => handleBackButtonClick(backTo)}
+        on:click={() => handleBackButtonClick()}
       >
         <span class="fas fa-chevron-left" />
       </button>
     {/if}
 
     {#if typeof title == "object" && title?.title == "my profile"}
-      <h1 class="header-title" on:click={eval(title?.action)}>
+      <h1 class="header-title" on:click={title?.action}>
         {@html title?.title}
         <span class="fa fa-chevron-down" />
       </h1>
@@ -88,7 +88,7 @@
           {#if option.type === "icon" || !option.type}
             <i class={option.icon} on:click={() => nav(option.link)} />
           {:else if option.type === "action"}
-            <i class={option.icon} on:click={() => eval(option.action)} />
+            <i class={option.icon} on:click={option.action} />
           {:else if option.type === "drop"}
             <div class="dropdown">
               <i class={option.icon} />

@@ -18,7 +18,7 @@
 
 
 <main>
-  <Header {navOptions} />
+  <Header {navOptions} locked={false} />
   <Posts />
   <Footer activePage={activePage} />
 </main>

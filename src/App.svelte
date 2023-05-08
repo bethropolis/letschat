@@ -13,13 +13,14 @@
   import Following from "./lib/following.svelte";
   import Notification from "./lib/notification.svelte";
   import Comment from "./lib/comment.svelte";
-  import StoriesBox from "./lib/ui/storiesBox.svelte";
+  import StoriesBox from "./lib/ui/settingSection.svelte";
   import Signup from "./lib/signup.svelte";
   import SinglePost from "./lib/singlePost.svelte";
   import Follow from "./lib/follow.svelte";
   import Tags from "./lib/tags.svelte";
 </script>
 
+<svelte:body dark="true" />
 <main>
   <Router>
     <Route path="/" component={Intro} />

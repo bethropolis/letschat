@@ -44,32 +44,28 @@ export function convertDateToTime(dateString) {
   return `${formattedHours}:${formattedMinutes} ${ampm}`;
 }
 
-// logout
-/**
- * logout the logged-in user and remove it from the list of users
- */
+
+
+
 export const logout = function () {
   try {
-    const loggedInUser = DB('get', 'login');
+    const loggedInUser = DB("get", "login");
     if (!loggedInUser) {
-      console.warn('No logged-in user found');
       return;
     }
-    const existingAcc = DB('get', 'extAcc');
+    const existingAcc = DB("get", "extAcc");
     if (!existingAcc) {
-      console.warn('No external account found');
-      return DB('clear');
+      return DB("clear");
     }
     const filteredUsers = existingAcc.users.filter(
       (user) => user.username !== loggedInUser.username
     );
-    DB('clear');
-    DB('set', 'extAcc', { users: filteredUsers });
+    DB("clear");
+    DB("update", "extAcc", { users: filteredUsers });
   } catch (error) {
     console.error(`Error occurred while logging out: ${error}`);
   }
 };
-
 
 // Validate a username
 export function isValidUsername(username) {
@@ -110,7 +106,12 @@ export function getPasswordStrength(password) {
     return "Fair";
   }
   // Check if the password is at least 8 characters long and contains at least one uppercase letter, one lowercase letter, one number, and one special character
-  else if (password.length >= 5 && !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-])/g.test(password)) {
+  else if (
+    password.length >= 5 &&
+    !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-])/g.test(
+      password
+    )
+  ) {
     return "Medium";
   }
   // Otherwise, the password is strong
@@ -120,17 +121,17 @@ export function getPasswordStrength(password) {
 }
 
 export function checkFileExtension(name) {
-    const imageExtensions = ["jpg", "jpeg", "png", "gif"];
-    const videoExtensions = ["mp4", "avi", "mov", "wmv"];
-    const audioExtensions = ["mp3", "wav", "ogg", "aac"];
-    const extension = name.split(".").pop().toLowerCase();
-    if (imageExtensions.includes(extension)) {
-      return "img";
-    } else if (videoExtensions.includes(extension)) {
-       return "vid";
-    } else if (audioExtensions.includes(extension)) {
-      return "mus";
-    } else {
-      return "txt";
-    }
+  const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+  const videoExtensions = ["mp4", "avi", "mov", "wmv"];
+  const audioExtensions = ["mp3", "wav", "ogg", "aac"];
+  const extension = name.split(".").pop().toLowerCase();
+  if (imageExtensions.includes(extension)) {
+    return "img";
+  } else if (videoExtensions.includes(extension)) {
+    return "vid";
+  } else if (audioExtensions.includes(extension)) {
+    return "mus";
+  } else {
+    return "txt";
   }
+}

@@ -90,11 +90,13 @@
       repost = response.data[0];
     });
   }
+
+
 </script>
 
 <main>
   {#if post.image_text}
-  <article class="post">
+  <article class="post" class:repost={isRepost}>
     <Lightbox bind:this={lightbox}>
       <div class="post-header user-info lightbox-header" slot="header">
         <div class="left">
@@ -227,7 +229,7 @@
         {:else}
           <p class="post-text">{@html post.image_text}</p>
       {#if repost && !isRepost}
-        <svelte:self post={repost} isRepost={true}/>
+        <svelte:self post={repost} isRepost={true} on:share={sharePost}/>
         {/if}
       {/if}
     </div>
@@ -264,6 +266,10 @@
     margin: 10px auto;
     position: relative;
     max-width: 90%;
+  }
+  .post.repost{
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
   }
 
   .post-header {

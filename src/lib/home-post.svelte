@@ -7,6 +7,7 @@
   import ModalBottom from "./ui/modalBottom.svelte";
   import { snack } from "../snack.js";
   import { nav } from "../route.js";
+  import ShareModal from "./ui/shareModal.svelte";
 
   let userToken = $login_token;
   let posts = [];
@@ -109,38 +110,8 @@
     postToShare = post;
   };
 
-  // Copy text to clipboard function
-  const copyTextToClipboard = (text) => {
-    const tempElement = document.createElement("textarea");
-    tempElement.value = text;
-    document.body.appendChild(tempElement);
-    tempElement.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempElement);
-  };
 
-  // Share link or text function
-  const shareLinkOrText = async (text, url) => {
-    const title = $config.name;
-    if (navigator.share) {
-      let shareData = {
-        title,
-        text,
-        url,
-      };
-      console.log(
-        "🚀 ~ file: home-post.svelte:116 ~ shareLinkOrText ~ shareData:",
-        shareData
-      );
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        snack("can't share");
-      }
-    } else {
-      snack("Share not supported");
-    }
-  };
+
 
   const storeState = () => {
     const data = {
@@ -188,61 +159,14 @@
       </span>
     {/if}
   </div>
+
   <button class="float-btn" on:click={() => nav("post")} class:show>
     <i class="fa fa-plus" />
   </button>
 
   <ModalBottom bind:isOpen={modal} {info}>
-    <div class="modal-content">
-      <div class="modal-content-header">
-        <h3>share to</h3>
-      </div>
-      <div class="modal-content-body">
-        <!-- share to  list of friends-->
-        {#if DB("get", "ChatList")}
-          <ul>
-            {#each DB("get", "ChatList") as friend}
-              <div class="item">
-                <div class="info">
-                  <img src={friend.image} alt="" />
-                  <span>{friend.username}</span>
-                </div>
-                <button
-                  on:click={() => {
-                    sharePost(postToShare);
-                  }}>share</button
-                >
-              </div>
-            {/each}
-          </ul>
-        {/if}
-      </div>
-      <div class="modal-content-footer">
-        <button
-          title="share link"
-          on:click={(elem) => {
-            let url = $config.base_url + "/post/" + postToShare.post_id;
-            let text = postToShare.image_text;
-            shareLinkOrText(text, url);
-          }}
-        >
-          <i class="fas fa-share-alt" />
-          <span>share</span>
-        </button>
-        <button
-          title="copy link"
-          on:click={(elem) => {
-            let text = `${$config.base_url}/post/${postToShare.post_id}`;
-            copyTextToClipboard(text);
-            let spanElem = elem.currentTarget.querySelector(".copy");
-            spanElem.innerHTML = "Copied!";
-          }}
-        >
-          <i class="fas fa-link" />
-          <span class="copy">copy</span>
-        </button>
-      </div>
-    </div></ModalBottom
+    <ShareModal {postToShare} />
+    </ModalBottom
   >
 </main>
 
@@ -310,62 +234,5 @@
   .float-btn:not(.show) {
     display: none;
   }
-  .modal-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-  }
-  .modal-content-body {
-    max-height: 300px;
-    padding: 5px 10px;
-    width: 100%;
-    overflow-y: auto;
-    background-color: var(--color-input);
-  }
-  .modal-content-body .item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 10px 0;
-  }
-  .modal-content-body .info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 80%;
-  }
-  .modal-content-body .item span {
-    font-size: 1.2rem;
-  }
-  .modal-content-body .item button {
-    padding: 5px 10px;
-    background-color: var(--primary-color);
-    color: var(--color-light);
-    border: none;
-    border-radius: 5px;
-  }
-  .modal-content-body .item img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-  }
-  .modal-content-footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding: 10px 0;
-    gap: 10px;
-  }
-  .modal-content-footer button {
-    padding: 5px 10px;
-    background-color: var(--primary-color);
-    color: var(--color-input);
-    border: none;
-    border-radius: 5px;
-  }
+ 
 </style>

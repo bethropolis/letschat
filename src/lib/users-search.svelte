@@ -5,14 +5,15 @@
   import APP from "../app.json";
   import { DB } from "../db.js";
   import Snackbar from "./ui/snackbar.svelte";
-  import Following from "./following.svelte";
-  import { onMount } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   let user_token = $login_token;
   let users = [];
   export let query = "";
   export let type;
   let msg;
   let snackbar;
+
+  const dispatch = createEventDispatcher();
   export async function makeSearch(pass=false) {
     if (query == "") {
       if (DB("get", "popular")) {
@@ -46,8 +47,7 @@
     }).then((data) => {
       snackbar?.showSnackbar(data.data.msg);
       if(data.data.type == "success"){
-        data.data.msg == "Followed" ? user.following = true : user.following = false;
-      }
+        data.data.msg == "Followed" ? (user.following = true, dispatch('follow')) : (user.following = false, dispatch('unfollow'));      }
     }).finally(() => {
       DB("set", "popular", users);
     });
@@ -103,7 +103,7 @@
       <span>No users found</span>
     </div>
   {/if}
-  <Snackbar bind:msg bind:this={snackbar}/>
+  <Snackbar bind:msg bind:this={snackbar} />
 </main>
 
 <style>

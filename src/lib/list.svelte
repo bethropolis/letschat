@@ -9,7 +9,7 @@
 
   export let chats = [];
   export let users = [];
-  let chatwith = null;
+  
   let searchActive = true;
   let searchQuery = "";
   let msg;
@@ -97,8 +97,14 @@
                 <i class="fas fa-video" />
                 {:else if chat.type == "mus"}
                 <i class="fas fa-music" />
+                {:else if chat.type == "txt"}
+                {chat.msg}
                 {:else}
-                {chat.msg || "empty chat"}
+                {#if chat.msg}
+                <i class="fas fa-square-poll-horizontal" />
+                {:else}
+                 empty chat
+                {/if}
                 {/if}
               </p>
               <div class="time">{formatTime(chat.time)}</div>

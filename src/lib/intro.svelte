@@ -112,6 +112,15 @@
     outline: 2px solid var(--color-primary);
   }
 
+  :global(.sup_btn:disabled),
+  :global(.sup_btn:disabled:hover),
+  :global(.sup_btn:disabled:active) {
+    background-color: var(--color-gray) !important;
+    border-color: var(--color-grey) !important;
+    outline: var(--color-gray) !important;
+    color: var(--color-lighter) !important;
+  }
+
   button.self {
     background-color: var(--lilac);
   }

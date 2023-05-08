@@ -5,6 +5,7 @@
   import VideoPlayer from "./videoPlayer.svelte";
   import MusicPlayer from "./musicPlayer.svelte";
   import Lightbox from "./lightbox.svelte";
+  import { nav } from "../../route";
 
   let messages = [];
   let start = 1;
@@ -19,8 +20,9 @@
   const emojiRegex = /[\uD800-\uDFFF]/;
   let y;
   let lightbox;
-  
+
   async function updateChatWith() {
+    console.log("🚀 ~ file: chatbox.svelte:26 ~ updateChatWith ~ chatwith:", users)
     chatwith = (await users.find((user) => user.username === username)) || {};
   }
 
@@ -38,8 +40,8 @@
         }));
         messages = [...messages, ...newMessages];
       }
-      if(messages.length > 0){
-      start = messages[messages.length-1].id;
+      if (messages.length > 0) {
+        start = messages[messages.length - 1].id;
       }
       setTimeout(
         () => getMessages({ to: data.to, from: data.from, start }),
@@ -91,6 +93,13 @@
     // Wrap code block in <pre><code> element
     return `<pre><code>${code.trim()}</code></pre>`;
   }
+
+  function renderShare(text, num=false) {
+    const parts = text.split("|");
+    if (num) return parts[1];
+    return parts[0];
+  }
+
   updateChatWith();
 
   $: if (key) {
@@ -125,7 +134,14 @@
 
           <div class="content">
             {#if message.type === "image" || message.type === "img"}
-              <img src={message.content} alt="shot" class="image" on:click={()=>{lightbox.openLightbox(message.content)}} />
+              <img
+                src={message.content}
+                alt="shot"
+                class="image"
+                on:click={() => {
+                  lightbox.openLightbox(message.content);
+                }}
+              />
             {:else if message.type === "txt"}
               <div class="text">{@html renderText(message.content)}</div>
             {:else if message.type === "vid"}
@@ -133,10 +149,17 @@
                 <VideoPlayer
                   videoProps={{ src: message.content, controls: true }}
                 />
-              </div>   
-              {:else if message.type === "mus"}
+              </div>
+            {:else if message.type === "mus"}
               <div class="image">
                 <MusicPlayer musicProps={{ src: message.content }} />
+              </div>
+            {:else if message.type === "share"}
+              <div class="image share">
+                <div class="share">
+                  <span>{username} shared a {renderShare(message.content)} with you</span>
+                  <button class="btn" on:click={() =>nav(`${renderShare(message.content)}/${renderShare(message.content, true)}`)}>view {renderShare(message.content)}</button>
+                </div>
               </div>
             {:else}
               <div class="text unsupported">unsuppoarted format</div>
@@ -212,7 +235,7 @@
     border-radius: 10px;
     margin: 10px;
   }
-  .content img{
+  .content img {
     width: 200px;
     height: 200px;
     object-fit: cover;
@@ -224,6 +247,30 @@
     border-radius: 20px;
     font-size: 14px;
     line-height: 1.4;
+  }
+
+  .share{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap:10px;
+  }
+
+  .share span {
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--color-text-lighter);
+  }
+
+  .share .btn{
+    background-color: var(--color-primary);
+    color: var(--color-lighter);
+    border: none;
+    border-radius: 10px;
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    width: 90%;
   }
   .unsupported {
     color: var(--mauve);

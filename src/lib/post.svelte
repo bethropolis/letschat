@@ -8,7 +8,6 @@
   import { checkFileExtension } from "../extra";
   import PostBox from "./ui/postBox.svelte";
 
-
   export let repost = null;
   let post;
 
@@ -112,7 +111,7 @@
     >
     <button
       class={activeTab === "file" ? "active" : ""}
-      on:click={() => handleTabClick("file")} disabled>File</button
+      on:click={() => handleTabClick("file")} disabled={repost}>File</button
     >
   </div>
 
@@ -186,7 +185,13 @@
 
   <div class="submit">
     <button on:click={handleSubmit} class="btn"
-      >{repost ? "Repost" : "Submit"}
+      >
+      {#if isSending}
+        <i class="fa fa-spinner fa-spin" />
+        sending...
+      {:else}
+      {repost ? "Repost" : "Submit"}
+      {/if}
       <!-- a loader -->
     </button>
   </div>

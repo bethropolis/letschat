@@ -3,14 +3,15 @@
   import { DB } from "../db.js";
   import { nav } from "../route.js";
   export let activePage = "";
-  let profilePicture ;
+  export let isFlash = null;
+  let profilePicture;
   function setActivePage(ispage, num) {
     activePage = ispage;
     nav(ispage);
   }
 
   function getProfilePicture() {
-   profilePicture = DB("get", "login", "profile_picture"); 
+    profilePicture = DB("get", "login", "profile_picture");
   }
   export { setActivePage };
 
@@ -24,6 +25,7 @@
       class:selected={activePage === "home"}
       href="#"
       on:click|preventDefault={() => setActivePage("home", 3)}
+      class:flash={isFlash == "home"}
     >
       <i class="fas fa-home" />
       <span>Home</span>
@@ -48,6 +50,7 @@
       class:selected={activePage === "notifications"}
       href="#"
       on:click|preventDefault={() => setActivePage("notification", 10)}
+      class:flash={isFlash == "notification"}
     >
       <i class="fas fa-bell" />
       <span>activity</span>
@@ -56,6 +59,7 @@
       class:selected={activePage === "profile"}
       href="#"
       on:click|preventDefault={() => setActivePage("profile", 4)}
+      class:flash={isFlash == "profile"}
     >
       {#if profilePicture}
         <img
@@ -130,5 +134,20 @@
 
   a.selected {
     color: var(--color-primary);
+  }
+  .flash {
+    animation: flash 1.5s infinite;
+  }
+
+  @keyframes flash {
+    0% {
+      color: var(--color-accent);
+    }
+    50% {
+     color: var(--color-light);
+    }
+    100% {
+      color: var(--color-accent);
+    }
   }
 </style>

@@ -18,11 +18,12 @@
     },
   };
   let info = {
-    icon: "fa-arrow-right-from-bracket",//
+    icon: "fa-arrow-right-from-bracket", //
     type: "action",
     action: function () {
       logout();
-    }
+      nav("login");
+    },
   };
   let isOpen = false;
   export let page = null;
@@ -48,8 +49,7 @@
       .then((res) => {
         profile = res.data;
       })
-      .catch((err) => {
-      });
+      .catch((err) => {});
   }
 
   const existingAccounts = DB("get", "extAcc", "users") || [];
@@ -71,9 +71,16 @@
     }, 1000);
   }
 
-   function switchAccount() {
+  function switchAccount() {
     nav("login");
   }
+  async function fetchChatList() {
+    const { data } = await makeRequest("follow", "GET", {  user_token:$login_token });
+    DB("set", "ChatList", data);
+    DB("set", "ChatListTime", Date());
+    return;
+  }
+
   async function followUser() {
     await makeRequest("follow", "POST", {
       user_token: $login_token,
@@ -82,6 +89,7 @@
       if (res.data.type === "error") {
         return snack(res.data.msg);
       }
+      fetchChatList();
       profile.isFollowing = !profile.isFollowing;
     });
   }
@@ -95,52 +103,53 @@
 </script>
 
 <main>
-  <Header title={username} {navOptions} />
- {#if profile}
-  <div class="container">
-    <div class="profile-details">
+  <Header title={username} {navOptions} locked={false} />
+  {#if profile}
+    <div class="container">
+      <div class="profile-details">
+        <img src={profile.picture} alt="Profile picture" />
+        <div class="user-name">
+          <h2>
+            {profile.name === " " ? profile.username : profile.name || " "}
+          </h2>
+          <h3>@{profile.username || ""}</h3>
+          <p class="muted">joined: {profile.date_joined || ""}</p>
+        </div>
+      </div>
+      <div class="info">
+        <div class="bio"><p>{profile.bio || "im using suplike"}</p></div>
+      </div>
+      <div class="numbers">
+        <span class="posts" title="Posts">{profile.post || ""} posts</span>
+        <span class="followers" title="Followers"
+          >{profile.followers || ""} followers</span
+        >
+        <span class="following" title="Following"
+          >{profile.following || ""} following</span
+        >
+      </div>
+      <div class="actions flex">
+        {#if DB("get", "login", "username") != profile.username}
+          <button
+            on:click={followUser}
+            class={profile.isFollowing ? "unfollow" : "follow"}
+          >
+            <i class="fa fa-plus" />
+            {profile.isFollowing ? "Unfollow" : "Follow"}
+          </button>
 
-      <img src={profile.picture} alt="Profile picture" />
-      <div class="user-name">
-        <h2>{profile.name === " " ? profile.username : profile.name||" "}</h2>
-        <h3>@{profile.username || ""}</h3>
-        <p class="muted">joined: {profile.date_joined||""}</p>
+          <button
+            class="chat"
+            on:click={() => {
+              nav(`chat/${profile.username}`);
+            }}
+          >
+            <i class="fa fa-comment" />
+            Chat
+          </button>
+        {/if}
       </div>
     </div>
-    <div class="info">
-      <div class="bio"><p>{profile.bio || "im using suplike"}</p></div>
-    </div>
-    <div class="numbers">
-      <span class="posts" title="Posts">{profile.post||""} posts</span>
-      <span class="followers" title="Followers"
-        >{profile.followers||""} followers</span
-      >
-      <span class="following" title="Following"
-        >{profile.following||""} following</span
-      >
-    </div>
-    <div class="actions flex">
-      {#if DB('get',"login","username") != profile.username}
-      <button
-        on:click={followUser}
-        class={profile.isFollowing ? "unfollow" : "follow"}
-      >
-        <i class="fa fa-plus" />
-        {profile.isFollowing ? "Unfollow" : "Follow"}
-      </button>
-
-      <button
-        class="chat"
-        on:click={() => {
-          nav(`chat/${profile.username}`);
-        }}
-      >
-        <i class="fa fa-comment" />
-        Chat
-      </button>
-      {/if}
-    </div>
-  </div>
   {/if}
   <div class="posts-page">
     {#if profile && profile.posts?.length > 0}
@@ -158,7 +167,11 @@
             {#each existingAccounts as account}
               <li on:click={() => selectAccount(account)}>
                 <img src={account.profile_picture} alt={account.full_name} />
-                <span>{account.full_name === " " ? account.username : account.full_name}</span>
+                <span
+                  >{account.full_name === " "
+                    ? account.username
+                    : account.full_name}</span
+                >
               </li>
             {/each}
           {/if}
@@ -169,10 +182,10 @@
       <!-- a loader is shown, switching accounts -->
       <div class="loader">
         <i class="fa fa-spinner fa-spin" />
-          {#if DB('get',"login","username") != profile.username}
-        <span> switching accounts...</span>
+        {#if DB("get", "login", "username") != profile.username}
+          <span> switching accounts...</span>
         {:else}
-        <span>you're logged in...</span>
+          <span>you're logged in...</span>
         {/if}
       </div>
     {/if}
