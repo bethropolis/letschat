@@ -35,7 +35,7 @@
       if (!oldData.some((oldItem) => oldItem.username === newData.username)) {
         const combinedData = [...oldData, newData];
         DB("update", "extAcc", JSON.stringify({ users: combinedData }));
-        return
+        return;
       }
       return DB("update", "extAcc", JSON.stringify({ users: oldData }));
     }
@@ -48,6 +48,7 @@
           updateExtAcc(response.data);
           DB("set", "login", response.data);
           DB("set", "token", response.data.user_token);
+          DB("set","session_token", response.data.session_token);
           $login_token = response.data.user_token;
           nav("home");
         } else {

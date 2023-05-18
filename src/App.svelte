@@ -20,7 +20,6 @@
   import Tags from "./lib/tags.svelte";
 </script>
 
-<svelte:body dark="true" />
 <main>
   <Router>
     <Route path="/" component={Intro} />

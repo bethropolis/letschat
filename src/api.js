@@ -4,9 +4,10 @@ import axios from "axios";
 const BASE_URL = config.base_url;
 const api_token = config.api_key;
 const version_no = config.version_no;
+const session_token = JSON.parse(localStorage.getItem("session_token")) || null;
 
 export async function makeRequest(endpoint, method, data = {}, headers = {}) {
-  let url = `${BASE_URL}/api/v${version_no}/${endpoint}/`;
+  let url = `${BASE_URL}/api/v${version_no}/${endpoint}/?uuid=${session_token}&`;
   const config = { method, headers };
   if (method !== "GET") {
     const formData = new FormData();
@@ -20,8 +21,8 @@ export async function makeRequest(endpoint, method, data = {}, headers = {}) {
     config.headers["Content-Type"] = "multipart/form-data";
     config.data = formData;
   } else {
-    const params = new URLSearchParams({ api_key: api_token, ...data });
-    url += `?${params.toString()}`;
+    const params = new URLSearchParams({ ...data });
+    url += `${params.toString()}`;
   }
   config.headers.Authorization = `Bearer ${api_token}`;
   try {

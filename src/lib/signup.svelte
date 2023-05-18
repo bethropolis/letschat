@@ -1,7 +1,6 @@
 <script>
   import { config, login_token } from "../store";
   import {
-    logout,
     getPasswordStrength,
     isValidEmail,
     isValidUsername,
@@ -26,6 +25,19 @@
   let passStrenght = "strong";
   let signupInProgress = false;
 
+  function updateExtAcc(newData) {
+    const oldData = DB("get", "extAcc").users || [];
+
+    DB("clear"); // this is to remove prev user's data
+
+    if (!oldData.some((oldItem) => oldItem.username === newData.username)) {
+      const combinedData = [...oldData, newData];
+      DB("update", "extAcc", JSON.stringify({ users: combinedData }));
+      return;
+    }
+    return DB("update", "extAcc", JSON.stringify({ users: oldData }));
+  }
+
   //   similar to login.svelte
   async function signup(userData) {
     if (!(await validate())) return;
@@ -48,10 +60,9 @@
       .then((response) => {
         signupInProgress = false;
         if (response.data.type == "success") {
-          logout();
+          updateExtAcc(response.data);
           DB("set", "login", response.data);
           DB("set", "token", response.data.user_token);
-          DB("set", "extAcc", JSON.stringify({ users: response.data }));
           $login_token = response.data.user_token;
           type = "rules";
           title = "server guidelines";
