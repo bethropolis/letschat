@@ -69,7 +69,7 @@
           on:click={() => selectUser(user)}
         >
           <img
-            src="{APP.base_url}/img/{user.profile_picture}"
+            src="{APP.base_url}/img/{user.profile_picture || 'default.jpg'}"
             alt={user.uidusers}
             on:click={() => loadProfile(user)}
           />

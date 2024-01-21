@@ -1,10 +1,12 @@
 <script>
   // almost similar to users-search.svelte
+  import { login_token } from "../store.js";
+  import { onMount } from "svelte";
   import { DB } from "../db.js";
   import { makeRequest } from "../api.js";
   import PostBox from "./ui/postBox.svelte";
-  import { onMount } from "svelte";
-  let user_token = "16c78b8e0c126b30749f8d93ad9de7479f7decb572";
+
+  let user_token = $login_token;
   let posts = [];
   export let query = null;
   export let type;
